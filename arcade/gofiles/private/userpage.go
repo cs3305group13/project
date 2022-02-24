@@ -1,9 +1,11 @@
 package private
 
 import (
+	"html"
 	"html/template"
 	"net/http"
 
+	"github.com/cs3305/group13_2022/project/poker"
 	"github.com/cs3305/group13_2022/project/utils/token"
 )
 
@@ -26,10 +28,20 @@ func checkForm( w http.ResponseWriter, r *http.Request ) {
 		attachPage( w, "userpage.html", UserPage{ Username: username })
 		return
 	} else {
-		// gameSetup := poker.HandlePokerForm(w, r)
-		// if gameSetup {
-		//     http.Redirect(w, r, "pokertable", http.StatusMovedPermanently)
-		// }
+		submitValue := html.EscapeString(r.FormValue("submit"))
+		switch submitValue {
+		case "poker" :
+            gameSetup := poker.HandlePokerForm(w, r)
+			if gameSetup {
+				http.Redirect(w, r, "pokertable", http.StatusMovedPermanently)
+			}
+
+		case "adventure_game" :
+			http.Redirect(w, r, "adventure_game", http.StatusMovedPermanently)
+
+	    case "blackjack" :
+			http.Redirect(w, r, "blackjack", http.StatusMovedPermanently)
+		}
 	}
 }
 

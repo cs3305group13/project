@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Protected Page</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+        <!-- <script src="/static/js/protected.js"></script> -->
+    </head>
+    <body>
+        <h1>Welcome to your page {{.Username}}!</h1>
+
+        <form action="" method="post">
+            <fieldset>
+
+                <input type="submit" value="poker" name="submit">
+
+                <label for="table_code">Table Code:</label>
+                <input type="text" id="table_code" name="table_code" >
+
+            </fieldset>
+        </form>
+
+        <form action="" method="post">
+            <fieldset>
+                
+                <input type="submit" value="adventure_game" name="submit">
+
+            </fieldset>
+        </form>
+
+        <form action="" method="post">
+            <fieldset>
+
+                <input type="submit" value="blackjack" name="submit">
+
+            </fieldset>
+        </form>
+
+    </body>
+</html>
