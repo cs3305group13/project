@@ -3,8 +3,8 @@ package insert
 import (
 	"testing"
 
-	"github.com/cs3305/group13_2022/project/env"
-	"github.com/cs3305group13/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/utils/env"
+	"github.com/cs3305/group13_2022/project/mysql_db"
 )
 
 var envs = env.GetEnvironmentVariables("../../testing.env")
