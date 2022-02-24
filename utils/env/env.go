@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
-	"github.com/cs3305/group13_2022/project/utils"
 	"github.com/joho/godotenv"
 )
 
@@ -21,7 +21,7 @@ import (
 func GetEnvironmentVariables(path string) map[string]string {
 	envVariables, err := godotenv.Read( path )
 	if err != nil {
-		if utils.StringContains(path, "../") {
+		if strings.Contains(path, "../") {
 			return GetEnvironmentVariables(path[3:])  // cuts off the starting `../` of the path 
 		} else {
 			mydir, err := os.Getwd()
