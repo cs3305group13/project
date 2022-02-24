@@ -9,14 +9,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Retrieves env variables from file named `.env`
+// Retrieves env variables from file named `*.env`
 //
 // param:
 // path parameter requires relative path from caller to the env file.
 //
 //
 // Env variables are retrieved from `map[string]string` like follows:
-//         env := GetEnvironmentVariables("../../.env")
+//         env := GetEnvironmentVariables("../../*.env")
 //         hostname := env["HOSTNAME"]
 func GetEnvironmentVariables(path string) map[string]string {
 	envVariables, err := godotenv.Read( path )
