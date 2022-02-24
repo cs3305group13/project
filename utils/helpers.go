@@ -1,7 +1,5 @@
 package utils
 
-import "strings"
-
 // Function removes string value from slice at position index s
 func Remove(slice []string, s int) []string {
     return append(slice[:s], slice[s+1:]...)
@@ -15,10 +13,4 @@ func ArrayContains(array []string, e string) bool {
         }
     }
     return false
-}
-
-// Function checks if the string e is inside string elements
-func StringContains(elements string, e string) bool {
-    array := strings.Split(elements, "")
-    return ArrayContains(array, e)
 }

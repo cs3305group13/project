@@ -11,19 +11,20 @@ import (
 	"github.com/cs3305/group13_2022/project/utils/env"
 )
 
-var envs = env.GetEnvironmentVariables("../../../../../.env")
+var envs = env.GetEnvironmentVariables("../../../../../production.env")
 var jwtKey = []byte(envs["TOKEN_KEY"])
 
 var TIME_UNTIL_EXPIRY, _ = strconv.Atoi(envs["TOKEN_LIFE"])
 
 type Claims struct {
-	Username   string `json:"username"`
-	GameType   string `json:"gameType"`
-	TableID    string `json:"tableID"`
+	Username string `json:"username"`
+	GameType string `json:"gameType"`
+	TableID string `json:"tableID"`
 	SeatNumber string `json:"seatNumber"`
-	Funds      string `json:"funds"`
+	Funds string `json:"funds"`
 	jwt.StandardClaims
 }
+
 
 // Creates default claims with additional username field and expiration time in minutes.
 func NewDefaultClaims(username, gameType, tableID, seatNumber, funds string) (*Claims, time.Time) {
@@ -32,29 +33,29 @@ func NewDefaultClaims(username, gameType, tableID, seatNumber, funds string) (*C
 	expirationTime := time.Now().Add(timeToLive)
 
 	claims := &Claims{
-		Username:   username,
-		GameType:   gameType,
-		TableID:    tableID,
-		SeatNumber: seatNumber,
-		Funds:      funds,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
+		              Username: username,
+					  GameType: gameType,
+					  TableID: tableID,
+					  SeatNumber: seatNumber,
+					  Funds: funds,
+                      StandardClaims: jwt.StandardClaims{ 
+						                                ExpiresAt: expirationTime.Unix(),	
+								                        },
+					}
 	return claims, expirationTime
 }
 
 // Appends token cookie to http.ResponseWriter
-func AppendTokenCookie(w http.ResponseWriter, tokenName string, claims *Claims, expirationTime time.Time) {
+func AppendTokenCookie( w http.ResponseWriter, tokenName string, claims *Claims, expirationTime time.Time ) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenString, _ := token.SignedString(jwtKey)
 
 	// Cookie may be dropped (ex. Something was wrong in tokenString implementation)
 	http.SetCookie(w, &http.Cookie{
-		Name:     tokenName,
-		Value:    tokenString,
-		Expires:  expirationTime,
+		Name:    tokenName,
+		Value:   tokenString,
+		Expires: expirationTime,
 		HttpOnly: true,
 	})
 }
@@ -73,21 +74,22 @@ func TokenValid(w http.ResponseWriter, r *http.Request, refresh bool) bool {
 
 	tokenTimeToLive := currentTime - tokenExpirationTime
 
-	if tokenTimeToLive > 0 { // tokenTimeToLive returns a number below or equal to zero if the token hasn't expired yet.
-		w.Write([]byte("You've been logged out, please sign in."))
+	
+	if tokenTimeToLive > 0 {  // tokenTimeToLive returns a number below or equal to zero if the token hasn't expired yet.
+	    w.Write([]byte("You've been logged out, please sign in."))
 		return false
 	}
 
 	if refresh == true {
 		refreshExpirationTime(w, r, "token")
 	}
-
+	
 	// End of validation, All statements should have been skipped if valid.
 	return true
 }
 
 // Updates tokens expiration date with the current time.
-func refreshExpirationTime(w http.ResponseWriter, r *http.Request, tokenName string) (err error) {
+func refreshExpirationTime( w http.ResponseWriter, r *http.Request, tokenName string ) (err error) {
 	claims, err := GetClaimsFromCookie(r, tokenName)
 	if err != nil {
 		fmt.Println("REMINDER: This is the error that came up: ", err)
@@ -100,12 +102,12 @@ func refreshExpirationTime(w http.ResponseWriter, r *http.Request, tokenName str
 	claims.ExpiresAt = newExpirationTime.Unix()
 	claims.StandardClaims.ExpiresAt = newExpirationTime.Unix()
 
-	AppendTokenCookie(w, "token", claims, newExpirationTime) // REMINDER: Cookie may be silently dropped.
+	AppendTokenCookie( w, "token", claims, newExpirationTime )  // REMINDER: Cookie may be silently dropped.
 	return nil
 }
 
 // Retrieves all claims stored in the token.
-func GetClaimsFromCookie(r *http.Request, cookieName string) (*Claims, error) {
+func GetClaimsFromCookie( r *http.Request, cookieName string ) (*Claims, error) {
 	c, err := r.Cookie(cookieName)
 
 	if err != nil {
@@ -114,7 +116,7 @@ func GetClaimsFromCookie(r *http.Request, cookieName string) (*Claims, error) {
 
 	tokenString := c.Value
 
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims( tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtKey), nil
 	})
 
@@ -125,28 +127,29 @@ func GetClaimsFromCookie(r *http.Request, cookieName string) (*Claims, error) {
 	}
 }
 
-func GetUsername(r *http.Request, tokenName string) string {
-	claims, _ := GetClaimsFromCookie(r, tokenName)
+
+func GetUsername( r *http.Request, tokenName string ) string {
+	claims, _ := GetClaimsFromCookie( r, tokenName )
 
 	return claims.Username
 }
-func GetGameType(r *http.Request, tokenName string) string {
-	claims, _ := GetClaimsFromCookie(r, tokenName)
+func GetGameType( r *http.Request, tokenName string ) string {
+	claims, _ := GetClaimsFromCookie( r, tokenName )
 
 	return claims.GameType
 }
-func GetTableID(r *http.Request, tokenName string) string {
-	claims, _ := GetClaimsFromCookie(r, tokenName)
+func GetTableID( r *http.Request, tokenName string ) string {
+	claims, _ := GetClaimsFromCookie( r, tokenName )
 
 	return claims.TableID
 }
-func GetSeatNumber(r *http.Request, tokenName string) string {
-	claims, _ := GetClaimsFromCookie(r, tokenName)
+func GetSeatNumber( r *http.Request, tokenName string ) string {
+	claims, _ := GetClaimsFromCookie( r, tokenName )
 
 	return claims.SeatNumber
 }
-func GetFunds(r *http.Request, tokenName string) string {
-	claims, _ := GetClaimsFromCookie(r, tokenName)
+func GetFunds( r *http.Request, tokenName string ) string {
+	claims, _ := GetClaimsFromCookie( r, tokenName )
 
 	return claims.Funds
 }
