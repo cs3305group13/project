@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/cs3305group13/project/mysql_db/utils"
+	"github.com/cs3305/group13_2022/project/utils"
 	_ "github.com/go-sql-driver/mysql"
 )
 
