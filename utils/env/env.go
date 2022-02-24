@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/cs3305/group13_2022/project/utils"
 	"github.com/joho/godotenv"
 )
 
@@ -18,18 +19,18 @@ import (
 //         env := GetEnvironmentVariables("../../.env")
 //         hostname := env["HOSTNAME"]
 func GetEnvironmentVariables(path string) map[string]string {
-	envVariables, err := godotenv.Read(path)
+	envVariables, err := godotenv.Read( path )
 	if err != nil {
-		if path != ".env" {
-			return GetEnvironmentVariables(path[3:]) // cuts off the starting `../` of the path
+		if utils.StringContains(path, "../") {
+			return GetEnvironmentVariables(path[3:])  // cuts off the starting `../` of the path 
 		} else {
 			mydir, err := os.Getwd()
-			if err != nil {
-				fmt.Println(err)
-			}
-			log.Fatal("could not find .env file through path: " + mydir)
+            if err != nil {
+                fmt.Println(err)
+            }
+			log.Fatalf("could not find .env file through path: %s from: %s", path, mydir)
 		}
 	}
-
+	
 	return envVariables
 }
