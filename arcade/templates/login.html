@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login Page</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+    </head>
+    <body>
+        <h1>Welcome to the login page!</h1>
+        <form action="" method="post">
+            <fieldset>
+
+                <legend>Login</legend>
+                <label for="username_ID" >Username:</label>
+                <input type="text" id="username_ID" name="username" >
+
+                <span id="usernameError"></span>
+
+                <label for="password_ID" >Password:</label>
+                <input type="password" id="password_ID" name="password" >
+
+                <span id="passwordError"></span>
+
+                <input type="submit">
+
+                <span id="formError">{{.GeneralProblem}}</span>
+                
+            </fieldset>
+        </form>
+    </body>
+</html>

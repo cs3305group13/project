@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sign Up Page</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+    </head>
+    <body>
+        <h1>Welcome to the Signup Page page!</h1>
+        <form action="" method="post" >
+            <fieldset>
+                <legend>Login</legend>
+                <label for="username_ID" >Username:</label>
+                <input type="text" id="username_ID" name="username" ></input>
+                <span>{{.UsernameProblem}}</span>
+
+                <label for="password_00_ID" >Password:</label>
+                <input type="password" id="password_00_ID" name="password_00" ></input>
+
+                <label for="password_01_ID" >Confirm Password:</label>
+                <input type="password" id="password_01_ID" name="password_01" ></input>
+                <span>{{.PasswordProblem}}</span>
+
+                <input type="submit" value="Submit">
+
+                {{/* Displays error message */}}
+                <span>{{.GeneralProblem}}</span>
+            </fieldset>
+        </form>
+    </body>
+</html>

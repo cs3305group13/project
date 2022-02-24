@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Protected Page</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+        <!-- <script src="/static/js/protected.js"></script> -->
+    </head>
+    <body>
+        <h1>Welcome to your page!</h1>
+
+        <h2 id="problem">{{.}}</h2>
+        <form action="" method="post">
+            <fieldset>
+
+                <legend>Poker</legend>
+
+                <input type="radio" id="poker_online" name="poker" value="poker_online" checked>
+                <label for="poker_online">Online</label>
+
+                <label for="table_code">Table Code:</label>
+                <input type="text" id="table_code" name="table_code" >
+                
+                <input type="radio" id="poker_offline" name="poker" value="poker_offline">
+                <label for="poker_offline">Offline</label>
+
+                <input type="submit" value="Play" >
+
+            </fieldset>
+        </form>
+        <!-- <form action="" method="post">
+            <fieldset>
+
+                <legend>Blackjack</legend>
+                
+                <label for="blackjack_online" >Online:</label>
+                <input type="button" id="blackjack_online" name="blackjack_online" >
+                
+                <label for="blackjack_offline" >Offline:</label>
+                <input type="button" id="blackjack_offline" name="blackjack_offline" >
+
+            </fieldset>
+        </form> -->
+
+    </body>
+</html>

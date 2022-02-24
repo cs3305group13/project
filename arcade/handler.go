@@ -16,7 +16,8 @@ func main() {
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	fmt.Print("\033[H\033[2J") // clears terminal
+	fmt.Print("\033[H\033[2J") // Tidies up terminal
+
 	fmt.Println("")
 	fmt.Println("##################################################")
 	fmt.Println("Server running on localhost: http://localhost:9000")
