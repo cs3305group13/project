@@ -1,7 +1,9 @@
 package env
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/joho/godotenv"
 )
@@ -21,7 +23,11 @@ func GetEnvironmentVariables(path string) map[string]string {
 		if path != ".env" {
 			return GetEnvironmentVariables(path[3:]) // cuts off the starting `../` of the path
 		} else {
-			log.Fatal("could not find .env file through path: " + path)
+			mydir, err := os.Getwd()
+			if err != nil {
+				fmt.Println(err)
+			}
+			log.Fatal("could not find .env file through path: " + mydir)
 		}
 	}
 
