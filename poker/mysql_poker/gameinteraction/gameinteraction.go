@@ -117,6 +117,27 @@ func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName
 }
 
 
-func PlayerRaised(w http.ResponseWriter, r *http.Request, DB *mysql_db.DB, tablesTableName, playersTableName, raiseAmount string) {
+func playerAllIn(tx *sql.Tx, playersTableName, username string) {
+	query := fmt.Sprintf(`UPDATE %s
+	                      SET player_state = "ALL_IN"
+						  WHERE username = "%s"`, playersTableName, username)
+
+	_, err := tx.Exec(query)
+	if err != sql.ErrNoRows {
+		utils.CheckError(err)
+	}
+
+}
+
+func playerRaised( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, raiseAmount string ) bool {
+
+	setOperation := fmt.Sprintf(`highest_bidder = "%s",
+	                             highest_bid = %s`, username, raiseAmount)
+
+	TryTakeMoneyFromPlayer(DB, tx, playersTableName, tableID, username, raiseAmount)
+	gameflow.AssignThisPlayerToRole(tx, pokerTablesTableName, tableID, username, setOperation)
+
+	return true
+}
 	
 }
