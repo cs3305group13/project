@@ -1,58 +1,163 @@
-package utils
+package gamestart
 
 import (
+	"database/sql"
+	"fmt"
 	"net/http"
-	"net/http/httptest"
 
+	"github.com/cs3305/group13_2022/project/cards"
+	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameflow"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinteraction"
+
+	"github.com/cs3305/group13_2022/project/utils"
 	"github.com/cs3305/group13_2022/project/utils/token"
 )
 
-// FUNCTIONS BELOW: Helper functions for appending cookie to Requests and Responses.
 
+func TryReadyUpPlayer(w http.ResponseWriter, r *http.Request, DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName string) {
 
-func CreateRequestWithPokerCookie(username, gameType, tableID, seatNumber, funds string) *http.Request {
-	w := CreateResponseWithCookie(username, gameType, tableID, seatNumber, funds)
+	tableID := token.GetTableID(r, "token")
 
-	request := "/"
-	r := httptest.NewRequest(http.MethodGet, request, nil)
+	if gameinteraction.GameInProgress(w, DB, tablesTableName, tableID) { // aka not everyone is ready
+		w.Write([]byte("MESSAGE:\nGame is in progress."))
+		return 
 
-	// Add the cookie to the request. THIS MAY BE INCORRECT.
-	r.AddCookie(w.Result().Cookies()[0])
+	} else {
+		db := mysql_db.EstablishConnection(DB)
+		tx := mysql_db.NewTransaction(db)
+		defer tx.Rollback()   // Defer a rollback in case anything fails.
+		defer db.Close()
 
-	return r
+		tableID := token.GetTableID(r, "token")
+		username := token.GetUsername(r, "token")
+
+		begin := readyUpPlayer(w, DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
+		err := tx.Commit()
+		if begin {
+			tx = mysql_db.NewTransaction(db)
+			beginGame(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+			tx.Commit()
+		}
+		utils.CheckError(err)
+		
+		return
+	}
 }
 
-// Creates a request with a plain token with username `Dave`
-// 
-// param: A submitted form request.
-// 
-// param example:
-//     request := "/pokertable?poker=online&tableCode=17"
-//     r := CreateRequestWithCookie( request )
-func CreateRequestWithCookie() *http.Request {
-	w := CreateResponseWithCookie("Dave", "", "", "", "0")
 
-	dummyRequestURL := "/pokertable?poker=online&tableCode=17"
-	r := httptest.NewRequest(http.MethodGet, dummyRequestURL, nil)
+func readyUpPlayer(w http.ResponseWriter, DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username string) (beginGame bool) {
+	query := fmt.Sprintf(`UPDATE %s
+	                      SET player_state = "READY"
+						  WHERE username = "%s";`, playersTableName, username)
+	_, err := tx.Exec(query)
 
-	// Add the cookie to the request. THIS MAY BE INCORRECT.
-	r.AddCookie(w.Result().Cookies()[0])
+	utils.CheckError(err)
 
-	return r
+	beginGame = checkIfGameShouldStart(w, DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+	return beginGame
+}
+func checkIfGameShouldStart(w http.ResponseWriter, DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) (beginGame bool) {
+	
+	query := fmt.Sprintf(`SELECT COUNT(*)
+	                      FROM %s
+						  WHERE player_state = "READY" AND table_id = "%s"`, playersTableName, tableID)
+	
+	var numberOfReadyPlayersAtTable int
+    err := tx.QueryRow(query).Scan(&numberOfReadyPlayersAtTable)
+	utils.CheckError(err)
+	
+	query = fmt.Sprintf(`SELECT COUNT(*)
+	                     FROM %s
+	                     WHERE table_id = %s;`, playersTableName, tableID)
+
+	var totalNumberOfPlayersAtTable int
+	err = tx.QueryRow(query).Scan(&totalNumberOfPlayersAtTable)
+	utils.CheckError(err)
+
+	if totalNumberOfPlayersAtTable > 1 && numberOfReadyPlayersAtTable == totalNumberOfPlayersAtTable {
+		startGame(tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+		beginGame = true
+		return beginGame
+	} else if totalNumberOfPlayersAtTable == 1 {
+		w.Write([]byte("PROBLEM:\nTo start at least two players need to be present."))
+		beginGame = false
+		return beginGame
+	} else {
+		w.Write([]byte("MESSAGE:\nSome players are not ready yet."))
+		beginGame = false
+		return beginGame
+	}
+}
+func startGame(tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) (beginGame bool) {
+
+	deck := cards.NewDeck(1)
+	cards.Shuffle(deck)
+
+	deckString := cards.DeckString(deck)
+	cardsNotInDeckString := ""
+
+	query := fmt.Sprintf(`UPDATE %s
+	                      SET game_in_progress = True,
+						      deck = "%s",
+							  cards_not_in_deck = "%s"
+						  WHERE table_id = %s;`, tablesTableName, deckString, cardsNotInDeckString, tableID)
+	_, err := tx.Exec(query)
+	utils.CheckError(err)
+
+	query = fmt.Sprintf(`UPDATE %s
+	                     SET player_state = "PLAYING"
+						 WHERE player_state = "READY" AND table_id = %s;`, playersTableName, tableID)
+
+	_, err = tx.Exec(query)
+	utils.CheckError(err)
+
+	return true
+}
+func beginGame(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
+	currentPlayerMakingMove, seatNumber := gameinfo.GetCurrentPlayerMakingMove(DB, tablesTableName, playersTableName, tableID)
+	
+	smallBlind, bigBlind, newCurrentPlayerMakingMove := findWhoShouldBeSmallAndBigBlind(DB, playersTableName, tableID, currentPlayerMakingMove, seatNumber)
+
+	smallBlindAmount := "1.0"
+	bigBlindAmount := "2.0"
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, tx, playersTableName, tableID, smallBlind, smallBlindAmount)
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, tx, playersTableName, tableID, bigBlind, bigBlindAmount)
+
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	// initialize the big blind as the highest bidder
+	query := fmt.Sprintf(`UPDATE %s
+						  SET highest_bidder = "%s"
+						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, tableID)
+
+	_, err := tx.Exec(query)  // result is ignored because TryTakeMoneyFromPlayers updates highestBidder
+
+	// set the current player as the player after the big blind
+    query = fmt.Sprintf(`UPDATE %s
+	                     SET current_player_making_move = "%s"
+						 WHERE table_id = %s;`, tablesTableName, newCurrentPlayerMakingMove, tableID)
+
+	res, err := tx.Exec(query)
+	utils.CheckError(err)
+	if utils.GetNumberOfRowsAffected(res) != 1 {
+		panic("Exactly one row should have been affected here.")
+	}
 }
 
-func CreateResponseWithCookie(username, gameType, tableID, seatNumber, funds string) *httptest.ResponseRecorder {
-	w := httptest.NewRecorder()  // NewRecorder works like ResponseWriter apparently.
 
-	claims, expirationTime := token.NewDefaultClaims(username, gameType, tableID, seatNumber, funds)
+func findWhoShouldBeSmallAndBigBlind(DB *mysql_db.DB, playersTableName, tableID, currentPlayerMakingMove, theirSeatNumber string) (small, big, newCurrentPlayer string) {
+	playerNames := gameflow.NextAvailablePlayers(DB, playersTableName, tableID, currentPlayerMakingMove, theirSeatNumber)
 
-	token.AppendTokenCookie(w, "token", claims, expirationTime)
+	small = playerNames[0]
+	big = playerNames[1]
+	if len(playerNames) == 2 {
+	    newCurrentPlayer = playerNames[0]
+	} else {
+		newCurrentPlayer = playerNames[1]
+	}
 
-	return w
+	return small, big, newCurrentPlayer
 }
-
-func CreateRegularResponse() *httptest.ResponseRecorder {
-	return httptest.NewRecorder()
-}
-
-// ################################################################################
