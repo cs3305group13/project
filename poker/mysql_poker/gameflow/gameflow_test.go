@@ -29,6 +29,13 @@ func TestNextAvailablePlayer(t *testing.T) {
 
 
 func TestNextAvailablePlayers(t *testing.T) {
+	tableID := "1"
+	
+	NextAvailablePlayers(DB, testingPlayersTableName, tableID, "derek", "1")
+}
+
+func TestSetNextAvailablePlayerAfterThisOne(t *testing.T) {
+	
 
 	mysql_poker.RefreshPlayers(DB, testingPlayersTableName)
 
