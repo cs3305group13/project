@@ -38,8 +38,8 @@ func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, 
 	setOperation += fmt.Sprintf(`"%s"`, playerName)
 
 	query := fmt.Sprintf(`UPDATE %s
-	                      SET %s %s
-						  WHERE table_id = %s;`, tableName, setOperation, playerName, tableID)
+	                      SET %s
+						  WHERE table_id = %s;`, tableName, setOperation, tableID)
 
 
 	res, err := tx.Exec(query)
