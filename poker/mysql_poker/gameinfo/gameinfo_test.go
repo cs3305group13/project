@@ -58,7 +58,7 @@ func TestGetPlayersFunds(t *testing.T) {
 	
 	funds := GetPlayersFunds(tx, testingPlayersTableName, username)
 
-	if funds != "30.00" {
+	if funds != 30.00 {
 		t.Errorf("%s should have 30.00 funds", username)
 	}
 	fmt.Println(funds)
@@ -95,5 +95,18 @@ func TestGetCurrentPlayerMakingMove(t *testing.T) {
 
 	if seatNumber == "" {
 		t.Error("current player making move seat number wasn't retrieved correctly")
+	}
+}
+
+func TestGetHighestBidder(t *testing.T) {
+	tableID := "1"
+	
+	bidder, bid := GetHighestBidder(DB, testingPokerTableName, tableID)
+
+	if bidder == "" {
+		t.Error("bidders name could not be retrieved")
+	}
+	if bid == 0 {
+		t.Error("bidders name could not be retrieved")
 	}
 }
