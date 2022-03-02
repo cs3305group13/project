@@ -23,7 +23,9 @@ func GameObserver(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTable
 		
 		removeIdleUsers(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID )
 		
-		tx.Commit()
+		
+		err := tx.Commit()
+		utils.CheckError(err)
 
 		numOfPlayers = gameinfo.GetNumberOfPlayersAtTable( DB, playersTableName, tableID )  // refresh numOfPlayers
 		
@@ -65,9 +67,6 @@ func removeIdleUsers(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableN
 	if err != sql.ErrNoRows {
 	    utils.CheckError(err)
 	}
-
-	err = tx.Commit()
-	utils.CheckError(err)
 
 	numberOfUsersRemoved := utils.GetNumberOfRowsAffected(res)
 	if numberOfUsersRemoved > 0 {
