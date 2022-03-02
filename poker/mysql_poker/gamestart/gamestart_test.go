@@ -13,7 +13,7 @@ import (
 var envs = env.GetEnvironmentVariables("../../../testing.env")
 	
 var w = utils.CreateRegularResponse()
-var r = utils.CreateRequestWithPokerCookie()
+var r = utils.CreateRequestWithPokerCookie("derek", "poker", "1", "1", "30.0")
 
 var DB = mysql_db.NewDB(envs)
 
