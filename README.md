@@ -98,3 +98,7 @@ These are discussed in more detail in later sections
 ---
 
 ## **Example Poker Game**
+
+### **Playing Poker Game Example**
+https://user-images.githubusercontent.com/78961144/156378791-dda22416-b768-41a5-91d0-56d55de20fd9.mp4
+
