@@ -29,6 +29,30 @@ func TestGetNumberOfPlayersAtTable(t *testing.T) {
 	}
 }
 
+func TestGetNumberOfPlayersAllIn(t *testing.T) {
+	
+	tableID := "1"
+
+	numOfRows := GetNumberOfPlayersAllIn(DB, testingPlayersTableName, tableID)
+
+	if numOfRows != 0 {
+		t.Error("No one should be ready")
+	}
+}
+
+func TestGetNumberOfPlayersStillPlaying(t *testing.T) {
+
+	tableID := "1"
+	username := "derek"
+	seatNumber := "1"
+
+	numOfRows := GetNumberOfPlayersStillPlaying(DB, testingPlayersTableName, tableID, username, seatNumber)
+
+	if numOfRows != 8 {
+		t.Error("Everyone should be playing")
+	}
+}
+
 func TestGetNextAvailableSeat(t *testing.T) {
 	
 	tableID := "1"
@@ -50,13 +74,8 @@ func TestGetNextAvailableSeat(t *testing.T) {
 
 func TestGetPlayersFunds(t *testing.T) {
 	username := "derek"
-
-	db := mysql_db.EstablishConnection(DB)
-	tx := mysql_db.NewTransaction(db)
-	defer tx.Rollback()
-	defer db.Close()
 	
-	funds := GetPlayersFunds(tx, testingPlayersTableName, username)
+	funds := GetPlayersFunds(DB, testingPlayersTableName, username)
 
 	if funds != 30.00 {
 		t.Errorf("%s should have 30.00 funds", username)
