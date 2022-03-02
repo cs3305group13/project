@@ -82,7 +82,21 @@ func GetHighestBidder(DB *mysql_db.DB, pokerTablesTableName, tableID string) (bi
 	return bidder, bid
 }
 
-func GetNumberOfPlayersAtTable( DB *mysql_db.DB, playersTableName, tableCode string ) (numOfRows int) {
+// Gets total number of players regardless of playerState
+func GetNumberOfPlayersAtTable( DB *mysql_db.DB, playersTableName, tableID string ) (numOfRows int) {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	var query = fmt.Sprintf(`SELECT COUNT(*) FROM %s WHERE table_id = %s;`, playersTableName, tableID)
+
+	err := db.QueryRow(query).Scan(&numOfRows)
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return
+}
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
 
