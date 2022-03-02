@@ -97,10 +97,18 @@ func GetNumberOfPlayersAtTable( DB *mysql_db.DB, playersTableName, tableID strin
 
 	return
 }
+
+// Get number of players either still playing or all in
+func GetNumberOfPlayersStillPlaying(DB *mysql_db.DB, playersTableName, tableID, username, seatNumber string) (numOfRows int) {
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
 
-	var query = fmt.Sprintf(`SELECT COUNT(*) FROM %s WHERE table_id = %s;`, playersTableName, tableCode)
+	var query = fmt.Sprintf(`SELECT COUNT(*) 
+	                         FROM %s 
+							 WHERE table_id = %s AND
+							       player_state != "NOT_READY" AND
+								   player_state != "FOLDED" AND
+								   player_state != "LEFT";`, playersTableName, tableID)
 
 	err := db.QueryRow(query).Scan(&numOfRows)
 	
