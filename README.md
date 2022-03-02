@@ -99,6 +99,11 @@ These are discussed in more detail in later sections
 
 ## **Example Poker Game**
 
-### **Playing Poker Game Example**
-https://user-images.githubusercontent.com/78961144/156378791-dda22416-b768-41a5-91d0-56d55de20fd9.mp4
+* #### **Playing Poker Game Example**
+  https://user-images.githubusercontent.com/78961144/156378791-dda22416-b768-41a5-91d0-56d55de20fd9.mp4
+
+* #### **Leaving & Rejoining Game**
+  
+
+https://user-images.githubusercontent.com/78961144/156379189-d2a50502-76e7-4883-ad05-24c5a7aae25d.mp4
 
