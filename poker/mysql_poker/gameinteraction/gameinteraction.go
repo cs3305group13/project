@@ -68,7 +68,13 @@ func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, table
 	return taken
 }
 
-func PlayersTurn(w http.ResponseWriter, r *http.Request, DB *mysql_db.DB, tablesTableName string) bool {
+func PlayersTurn(DB *mysql_db.DB, tablesTableName, playersTableName, tableID, username string) bool {
+
+	currentPlayerMakingMove, _ := gameinfo.GetCurrentPlayerMakingMove(DB,tablesTableName, playersTableName, tableID)
+
+	if username == currentPlayerMakingMove {
+		return true
+	}
 
 	return false
 }
