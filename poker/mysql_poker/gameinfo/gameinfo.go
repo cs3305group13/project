@@ -148,12 +148,16 @@ func GetNextAvailableSeat(DB *mysql_db.DB, playersTableName, tableID string) (ne
 	}
 }
 
-func GetPlayersFunds(tx *sql.Tx, playersTableName, username string) (funds float64) {
+func GetPlayersFunds(DB *mysql_db.DB, playersTableName, username string) (funds float64) {
+	
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+	
 	query := fmt.Sprintf(`SELECT funds
 	                      FROM %s
 						  WHERE username = "%s"`, playersTableName, username)
 
-	err := tx.QueryRow(query).Scan(&funds)
+	err := db.QueryRow(query).Scan(&funds)
 	utils.CheckError(err)
 
 	return funds
