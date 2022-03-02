@@ -7,7 +7,6 @@ import (
 	"github.com/cs3305/group13_2022/project/mysql_db/find"
 	"github.com/cs3305/group13_2022/project/mysql_db/insert"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
-	"github.com/cs3305/group13_2022/project/utils"
 )
 
 // ############# TABLE JOIN STUFF BELOW. ##############
@@ -25,9 +24,8 @@ func CheckTableExists( tx *sql.Tx, tablesTableName, tableCode string ) bool {
 
 
 func UpdatePlayersSelectedGame(tx *sql.Tx, playersTableName, tableID, username, seatNumber string) (funds string) {
-	fundsInTable := gameinfo.GetPlayersFunds(tx, playersTableName, username)
+	userFunds := gameinfo.GetPlayersFunds(tx, playersTableName, username)
 
-	userFunds := utils.ConvertToFloat(fundsInTable)
 	if userFunds < 5.0 {
 		userFunds = 30.0
 	}
