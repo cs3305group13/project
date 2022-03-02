@@ -10,8 +10,8 @@ import (
 // FUNCTIONS BELOW: Helper functions for appending cookie to Requests and Responses.
 
 
-func CreateRequestWithPokerCookie() *http.Request {
-	w := CreateResponseWithCookie("bob", "poker", "1", "1", "30.0")
+func CreateRequestWithPokerCookie(username, gameType, tableID, seatNumber, funds string) *http.Request {
+	w := CreateResponseWithCookie(username, gameType, tableID, seatNumber, funds)
 
 	request := "/"
 	r := httptest.NewRequest(http.MethodGet, request, nil)
@@ -29,10 +29,11 @@ func CreateRequestWithPokerCookie() *http.Request {
 // param example:
 //     request := "/pokertable?poker=online&tableCode=17"
 //     r := CreateRequestWithCookie( request )
-func CreateRequestWithCookie(request string) *http.Request {
+func CreateRequestWithCookie() *http.Request {
 	w := CreateResponseWithCookie("Dave", "", "", "", "0")
 
-	r := httptest.NewRequest(http.MethodGet, request, nil)
+	dummyRequestURL := "/pokertable?poker=online&tableCode=17"
+	r := httptest.NewRequest(http.MethodGet, dummyRequestURL, nil)
 
 	// Add the cookie to the request. THIS MAY BE INCORRECT.
 	r.AddCookie(w.Result().Cookies()[0])
