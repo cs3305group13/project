@@ -11,6 +11,7 @@ import (
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gamejoin"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameobserver"
+	"github.com/cs3305/group13_2022/project/utils"
 	"github.com/cs3305/group13_2022/project/utils/env"
 	"github.com/cs3305/group13_2022/project/utils/token"
 )
@@ -78,13 +79,14 @@ func createOnlinePoker( w http.ResponseWriter, r *http.Request, envs map[string]
 
 	seatNumber, _ := gameinfo.GetNextAvailableSeat(DB, playersTableName, tableID)
 	
-	funds := gamejoin.UpdatePlayersSelectedGame(tx, playersTableName, tableID, username, seatNumber)
+	funds := gamejoin.UpdatePlayersSelectedGame(DB, tx, playersTableName, tableID, username, seatNumber)
 
 
 	claims, expirationTime := token.NewDefaultClaims(username, "poker", tableID, seatNumber, funds)
 	token.AppendTokenCookie(w, "token", claims, expirationTime)
 	
-	tx.Commit()
+	err := tx.Commit()
+	utils.CheckError(err)
 
 	go gameobserver.GameObserver(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 
@@ -104,7 +106,7 @@ func joinOnlinePoker( w http.ResponseWriter, r *http.Request, envs map[string]st
 	defer db.Close()
 
 	if gamejoin.CheckTableExists(tx, tablesTableName, tableID) == false {
-		attachUserPage(w, "Sorry please make sure to specify a valid tableCode.")
+		attachUserPage(w, "MESSAGE:\nSorry please make sure to specify a valid tableCode.")
 		return false
 	} else {
 		username := token.GetUsername(r, "token")
@@ -121,7 +123,7 @@ func joinOnlinePoker( w http.ResponseWriter, r *http.Request, envs map[string]st
 				attachUserPage(w, "Sorry this table is full.")
 			    return false
 			} else {
-				funds := gamejoin.UpdatePlayersSelectedGame( tx, playersTableName, tableID, username, seatNumber )
+				funds := gamejoin.UpdatePlayersSelectedGame( DB, tx, playersTableName, tableID, username, seatNumber )
 
 				claims, expirationTime := token.NewDefaultClaims(username, "poker", tableID, seatNumber, funds)
 				token.AppendTokenCookie(w, "token", claims, expirationTime)
