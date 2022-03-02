@@ -42,13 +42,15 @@ func GameInProgress(w http.ResponseWriter, DB *mysql_db.DB, tablesTableName, tab
 						          highest_bid = %v
 						      WHERE table_id = %s;`, pokerTablesTableName, highestBidder, highestBid, tableID)
 		
-        res, err := tx.Exec(query)
+func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, tableID, playerName, bid string) (taken bool) {
+	playersFunds := gameinfo.GetPlayersFunds(DB, playersTableName, playerName)
+	
+	playersBid, err := strconv.ParseFloat(bid, 64)
 		utils.CheckError(err)
 
-		rowsAffected := utils.GetNumberOfRowsAffected(res)
-		if rowsAffected != 1 {
-			panic("exactly one row should have been affected")
-		}
+	if playersFunds < playersBid {
+		taken = false
+		return taken
 	}
 
 	query := fmt.Sprintf(`UPDATE %s
