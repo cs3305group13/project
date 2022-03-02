@@ -7,28 +7,32 @@ import (
 	"strconv"
 
 	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameflow"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameshowdown"
 	"github.com/cs3305/group13_2022/project/utils"
 )
 
-func GameInProgress(w http.ResponseWriter, r *http.Request, tx *sql.Tx, tablesTableName string) bool {
+func GameInProgress(w http.ResponseWriter, DB *mysql_db.DB, tablesTableName, tableID string) bool {
 	
-	return false
-}
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
 
+	query := fmt.Sprintf(`SELECT game_in_progress
+	                      FROM %s
+						  WHERE table_id = "%s"`, tablesTableName, tableID)
 
-func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, pokerTablesTableName, tableID, playerName, bid string) (taken bool) {
-	playersFunds := gameinfo.GetPlayersFunds(tx, playersTableName, playerName)
+	var gameState bool
+	err := db.QueryRow(query).Scan(&gameState)
 	
-	playersBid, err := strconv.ParseFloat(bid, 64)
 	utils.CheckError(err)
 
-	if playersFunds < playersBid {
-		taken = false
-		return taken
+	if gameState {
+		w.Write([]byte("MESSAGE:\nSorry game is in progress, should be over soon."))
 	}
 
-	highestBidder, highestBid := gameinfo.GetHighestBidder(DB, pokerTablesTableName, tableID)
+	return gameState
+}
 
 	if highestBid < playersBid {
 		highestBidder = playerName
