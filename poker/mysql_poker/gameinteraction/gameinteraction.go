@@ -80,7 +80,39 @@ func PlayersTurn(DB *mysql_db.DB, tablesTableName, playersTableName, tableID, us
 }
 
 
-func PlayerFolded(w http.ResponseWriter, r *http.Request, DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName string) {
+func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber string) {
+	
+	setOperation := "current_player_making_move = "
+	successful := gameflow.SetNextAvailablePlayerAfterThisOne(DB, tx, tablesTableName, playersTableName, tableID, username, seatNumber, setOperation)
+
+	numberOfPlayersStillPlaying := gameinfo.GetNumberOfPlayersStillPlaying(DB, playersTableName, tableID, username, seatNumber)
+	// ^ contains number of players still in game (this player who wants to fold, players still playing, and all in players)
+
+	if ! successful && numberOfPlayersStillPlaying == 1{
+		// no one is all in and this is last player not folded so cannot let them fold
+		// give player pot
+		return
+	} else if ! successful && numberOfPlayersStillPlaying > 1{
+		gameshowdown.ShowDown(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+	}else {
+		// if here then there are still other players playing therefore this player can fold
+
+		query := fmt.Sprintf(`
+							UPDATE %s
+							SET player_state = "FOLDED"
+							WHERE username = "%s"`, playersTableName, username)
+							
+		response, err := tx.Exec(query)
+		utils.CheckError(err)
+
+		numberOfRows := utils.GetNumberOfRowsAffected(response)
+
+		if numberOfRows != 1 {
+			panic("One and only one row should have been changed with this operation.")
+		}
+	} 
+}
+
 
 }
 
