@@ -97,6 +97,24 @@ func GetNumberOfPlayersAtTable( DB *mysql_db.DB, playersTableName, tableCode str
 	return
 }
 
+func GetNumberOfPlayersAllIn(DB *mysql_db.DB, playersTableName, tableID string) int {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	query := fmt.Sprintf(`SELECT COUNT(*)
+	                      FROM %s
+						  WHERE table_id = %s AND player_state = "ALL_IN"`, playersTableName, tableID)
+
+	var numberOfAllInPlayers int
+	err := db.QueryRow(query).Scan(&numberOfAllInPlayers)
+
+	if err != sql.ErrNoRows {
+	    utils.CheckError(err)
+	}
+
+	return numberOfAllInPlayers
+}
+
 func GetNextAvailableSeat(DB *mysql_db.DB, playersTableName, tableID string) (nextAvailableSeat string, seatFound bool) {
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
