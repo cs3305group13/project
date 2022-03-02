@@ -51,7 +51,7 @@ func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, 
 }
 
 // return next available players who are not idle nor in 'NOT_READY', 'LEFT', 'FOLDED', and 'ALL_IN' state.
-func NextAvailablePlayers(DB *mysql_db.DB, playersTableName, tableID, username, seatNumber string) (playersAfter, playersBefore *sql.Rows) {
+func NextAvailablePlayers(DB *mysql_db.DB, playersTableName, tableID, username, seatNumber string) (playerNames []string) {
 
 	// TODO: Make "5" seconds into an env variable.
 	db := mysql_db.EstablishConnection(DB)
@@ -71,44 +71,47 @@ func NextAvailablePlayers(DB *mysql_db.DB, playersTableName, tableID, username, 
 	playersAfter, err := db.Query(query)
 	utils.CheckError(err)
 
+	var playerName string
+
+	for playersAfter.Next() {
+		err := playersAfter.Scan(&playerName)
+		utils.CheckError(err)
+		playerNames = append(playerNames, playerName)
+	}
+	playersAfter.Close()
+
+	query = fmt.Sprintf(`SELECT username
+						 FROM %s
+						 WHERE table_id = %s AND
+						       seat_number <= %s AND
+						       player_state != "NOT_READY" AND
+							   player_state != "LEFT" AND
+							   player_state != "FOLDED" AND
+							   player_state != "ALL_IN" AND
+							   time_since_request > DATE_SUB(NOW(), INTERVAL %s SECOND)
+						 ORDER BY seat_number ASC;`, playersTableName, tableID, seatNumber, "5")  // seat_number used to be `<` it is `<=` because of dealer, big, small blinds overlap.
 	
-    
-	query = fmt.Sprintf(` SELECT username
-						  FROM %s
-						  WHERE table_id = %s AND
-						        seat_number <= %s AND
-								player_state != "NOT_READY" AND
-								player_state != "LEFT" AND
-								player_state != "FOLDED" AND
-								player_state != "ALL_IN" AND
-								time_since_request > DATE_SUB(NOW(), INTERVAL %s SECOND)
-						  ORDER BY seat_number ASC;`, playersTableName, tableID, seatNumber, "5")  // seat_number used to be `<` it is `<=` because of dealer, big, small blinds overlap.
-	
-	playersBefore, err = db.Query(query)
+	playersBefore, err := db.Query(query)
 	utils.CheckError(err)
 
-	return playersAfter, playersBefore
+	for playersBefore.Next() {
+		err := playersBefore.Scan(&playerName)
+		utils.CheckError(err)
+		playerNames = append(playerNames, playerName)
+	}
+	playersBefore.Close()
+
+	return playerNames
 }
 
 // return next available player who is not idle nor in 'NOT_READY', 'LEFT', 'FOLDED', and 'ALL_IN' state.
 func NextAvailablePlayer(DB *mysql_db.DB, playersTableName, tableID, username, seatNumber string) (playerName string) {
 	
-	playersAfter, playersBefore := NextAvailablePlayers(DB, playersTableName, tableID, username, seatNumber)
+	playerNames := NextAvailablePlayers(DB, playersTableName, tableID, username, seatNumber)
 
-	// tries to find a player next in line ie if user is at index 4 it returns anyone who is at 5, 6, 7 
-	for playersAfter.Next() {
-		err := playersAfter.Scan(&playerName)
-		utils.CheckError(err)
-		return playerName
+	if len(playerNames) != 0 {
+		playerName = playerNames[0]
 	}
 
-	// tries to find a player before ie if user is at index 4 it returns anyone who is at 0, 1, 2, 3 
-	for playersBefore.Next() {
-		err := playersBefore.Scan(&playerName)
-		utils.CheckError(err)
-		return playerName
-	}
-
-	// if here, no one was found
-	return
+	return playerName
 }
