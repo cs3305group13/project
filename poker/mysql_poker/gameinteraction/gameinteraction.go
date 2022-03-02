@@ -24,7 +24,7 @@ func GameInProgress(w http.ResponseWriter, DB *mysql_db.DB, tablesTableName, tab
 
 	var gameState bool
 	err := db.QueryRow(query).Scan(&gameState)
-	
+
 	utils.CheckError(err)
 
 	if gameState {
@@ -34,19 +34,12 @@ func GameInProgress(w http.ResponseWriter, DB *mysql_db.DB, tablesTableName, tab
 	return gameState
 }
 
-	if highestBid < playersBid {
-		highestBidder = playerName
-		highestBid = playersBid
-		query := fmt.Sprintf(`UPDATE %s 
-	                          SET highest_bidder = "%s",
-						          highest_bid = %v
-						      WHERE table_id = %s;`, pokerTablesTableName, highestBidder, highestBid, tableID)
-		
+
 func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, tableID, playerName, bid string) (taken bool) {
 	playersFunds := gameinfo.GetPlayersFunds(DB, playersTableName, playerName)
 	
 	playersBid, err := strconv.ParseFloat(bid, 64)
-		utils.CheckError(err)
+	utils.CheckError(err)
 
 	if playersFunds < playersBid {
 		taken = false
@@ -130,7 +123,7 @@ func PlayerTakesAction( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTab
 	funds := gameinfo.GetPlayersFunds(DB, playersTableName, username)
 	if funds <= raiseAmountAsFloat {
 		playerAllIn(tx, playersTableName, username)
-}
+	}
 
 	setOperation := "current_player_making_move = "
 	gameflow.SetNextAvailablePlayerAfterThisOne(DB, tx, tablesTableName, playersTableName, tableID, username, seatNumber, setOperation)
@@ -158,5 +151,15 @@ func playerRaised( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableNam
 
 	return true
 }
-	
+
+func playerCalled( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, raiseAmount string ) bool {
+
+
+	return true
+}
+
+func playerChecked( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username string ) bool {
+
+
+	return true
 }
