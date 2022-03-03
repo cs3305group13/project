@@ -79,6 +79,26 @@ function insertPlayersIntoHTML( players ) {
     }
 }
 
+// function checks if player list html should refresh 
+function detectRefresh() {
+    if (usernameTAG.innerHTML !== username ) {
+        return false;
+    }
+    if (fundsTAG.innerHTML !== funds ) {
+        return false;
+    }
+    if (stateTAG.innerHTML !== playerState ) {
+        return false;
+    }
+    if (moneyInPotTAG.innerHTML !== moneyInPOT ) {
+        return false;
+    }
+    if (cardsTAG.innerHTML !== cards ) {
+        return false;
+    }
+    return true;
+}
+
 function insertDetailsIntoHTML( tableDetails ) {
     communityCardsTAG = document.querySelector("#community_cards");
     currentPlayerMakingMoveTAG = document.querySelector("#current_player_making_move");
