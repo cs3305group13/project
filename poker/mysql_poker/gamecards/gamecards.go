@@ -71,7 +71,7 @@ func GivePlayersTheirCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, players
 	var card2 string
 	var playersCard string
 
-	for i:=0; i<len(playerMakingMove); i++ {
+	for i:=0; i<len(playersPlaying); i++ {
 		card1 = cards.TakeCard(deck, cardsNotInDeck)
 		card2 = cards.TakeCard(deck, cardsNotInDeck)
 
