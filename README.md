@@ -67,9 +67,12 @@ These are discussed in more detail in later sections
 
 ## **Section 3 - Key Features**
 
-* When a poker game is created its members are monitored and kicked if idle, this 
-  process is active as long as their are players not idle. *more details can be found in gameobserver package*
-* Poker hand evaluation is fully functioning thanks to Che-Hsun Liu's package [github.com/chehsunliu/poker](https://github.com/chehsunliu/poker)
+  * When a poker game is created its members are monitored and kicked if idle, this 
+    process is active as long as their are players not idle. *more details can be found in gameobserver package*
+
+  * Poker hand evaluation is fully functioning thanks to Che-Hsun Liu's package [github.com/chehsunliu/poker](https://github.com/chehsunliu/poker)
+
+  * Poker game initialization is captured in a transaction preventing a joining user from automatically being assumed to be ready while the game is being set up.
 
 ---
 
@@ -81,7 +84,7 @@ These are discussed in more detail in later sections
     * Deadlocks still may occur in grey areas such as during start game sequence. (Basically any time a user performs an action and quickly they or someone else performs another action, this may trigger a deadlock due to a transaction still being executed, very unlikely though.)
   
   * ### **Bugs**
-    * During testing it was seen users using a Safari browser would be kicked for being idle whereas browsers like Google Chrome, Brave Browser and FireFox would be unaffected.
+    * During testing it was seen users using a Safari browser would be kicked after some time for being idle whereas browsers like Google Chrome, Brave Browser and FireFox would be mostly unaffected. This may be due to ajax http request prioritisation given to the default browser, we were using Google Chrome.
 
 --- 
 
