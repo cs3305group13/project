@@ -52,6 +52,34 @@ func TestPlayersTurn(t *testing.T) {
 	}
 }
 
+func TestPlayerTakesAction(t *testing.T) {
+
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	tableID := "1"
+	username := "derek"
+	seatNumber := "1"
+	raiseAmount := "1.0"
+
+	PlayerTakesAction(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTableName, tableID, username, seatNumber, raiseAmount)
+}
+
+func TestPlayerAllIn(t *testing.T) {
+
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	username := "derek"
+
+
+	playerAllIn(tx, testingPlayersTableName, username)
+}
+
 func TestTryTakeMoneyFromPlayer(t *testing.T) {
 
 	db := mysql_db.EstablishConnection(DB)

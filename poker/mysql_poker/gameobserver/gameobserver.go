@@ -12,16 +12,18 @@ import (
 )
 
 // Function monitors if any players go idle. Should be use with goroutine call.
+//
+// IMPORTANT - dont test
 func GameObserver(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
 
 	numOfPlayers := gameinfo.GetNumberOfPlayersAtTable( DB, playersTableName, tableID )  // check how many players are in game.
-		db := mysql_db.EstablishConnection(DB)
-		defer tx.Rollback()
-		defer db.Close()
-
-		for numOfPlayers != 0 {
-			tx = mysql_db.NewTransaction(db)
-		}
+	db := mysql_db.EstablishConnection(DB)
+	var tx *sql.Tx
+	defer tx.Rollback()
+	defer db.Close()
+	
+	for numOfPlayers != 0 {
+		tx = mysql_db.NewTransaction(db)
 		
 		removeIdleUsers(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID )
 		

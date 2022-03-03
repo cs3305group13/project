@@ -37,15 +37,3 @@ func TestRemoveIdleUsers(t *testing.T) {
 	removeIdleUsers(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID)
 }
 
-func TestGameObserver(t *testing.T) {
-
-	db := mysql_db.EstablishConnection(DB)
-	tx := mysql_db.NewTransaction(db)
-	defer tx.Rollback()
-	defer db.Close()
-
-	tableID := "1"
-
-	GameObserver(DB, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID)
-
-}
