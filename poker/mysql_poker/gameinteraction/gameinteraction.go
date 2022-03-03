@@ -107,15 +107,21 @@ func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName
 }
 
 
-func PlayerTakesAction( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, raiseAmount string ) {
+func PlayerTakesAction( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, raiseAmount string ) (state bool) {
 	raiseAmountAsFloat := utils.ConvertToFloat(raiseAmount)
 
 	_, highestBid := gameinfo.GetHighestBidder(DB, pokerTablesTableName, tableID)
 	if highestBid == 0.0 && raiseAmountAsFloat == 0.0 {
 		playerChecked(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
+
+	} else if raiseAmountAsFloat < highestBid { 	
+		// if user didn't specify at least the same amount as highestBidder then we fold.
+		PlayerFolded(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber)
+	
 	} else if raiseAmountAsFloat < highestBid*2 {
 		// if here raise amount was not at least double of previous highest bid
 		playerCalled(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, raiseAmount)
+	
 	} else if raiseAmountAsFloat > highestBid*2 {
 		playerRaised(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, raiseAmount)
 	}
@@ -127,6 +133,8 @@ func PlayerTakesAction( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTab
 
 	setOperation := "current_player_making_move = "
 	gameflow.SetNextAvailablePlayerAfterThisOne(DB, tx, tablesTableName, playersTableName, tableID, username, seatNumber, setOperation)
+
+	return true
 }
 
 func playerAllIn(tx *sql.Tx, playersTableName, username string) {
