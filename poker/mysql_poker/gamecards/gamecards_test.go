@@ -1,14 +1,16 @@
 package gamecards
 
-import ( 
+import (
 	"testing"
 
 	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/testing/mysql_poker"
 	"github.com/cs3305/group13_2022/project/utils/env"
 )
 
-var envs = env.GetEnvironmentVariables("../../../testing.env")
 
+var envs = env.GetEnvironmentVariables("../../../testing.env")
+	
 var DB = mysql_db.NewDB(envs)
 
 var testingTablesTableName = envs["TESTING_TABLES_TABLE"]
@@ -16,19 +18,18 @@ var testingPlayersTableName = envs["TESTING_PLAYERS_TABLE"]
 var testingPokerTableName = envs["TESTING_POKER_TABLES_TABLE"]
 
 
-func TestAddCards( t *testing.T) {
+func TestAddCards(t *testing.T) {
+
 	db := mysql_db.EstablishConnection(DB)
 	tx := mysql_db.NewTransaction(db)
 	defer tx.Rollback()
 	defer db.Close()
 
 	tableID := "1"
-	cardsToAdd := "2h10CAH"
+	cardsToAdd := "2H10CAH"
 
 	addCards(tx, testingPokerTableName, tableID, cardsToAdd)
-
 }
-
 
 func TestRefreshDeckAndCardsNotInDeck(t *testing.T) {
 	db := mysql_db.EstablishConnection(DB)
@@ -48,6 +49,34 @@ func TestGetCards(t *testing.T) {
 	tableID := "1"
 
 	getCards(DB, testingTablesTableName, tableID)
+}
+
+func TestAssignPlayerHisCards(t *testing.T) {
+	
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	tableID := "1"
+	username := "derek"
+	cardsString := "AHAC"  // ace of hearts and clubs
+
+	assignPlayerHisCards(tx, testingPlayersTableName, tableID, username, cardsString)
+}
+
+func TestGivePlayersTheirCards(t *testing.T) {
+	
+	mysql_poker.RefreshPlayers(DB, testingPlayersTableName)
+
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	tableID := "1"
+	
+	GivePlayersTheirCards(DB, tx, testingTablesTableName, testingPlayersTableName, tableID)
 }
 
 func TestGetCommunityCards(t *testing.T) {
