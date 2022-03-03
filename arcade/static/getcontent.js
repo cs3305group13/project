@@ -39,24 +39,38 @@ function insertGameContent( gameContent ) {
 }
 
 
+let usernameTAG;
+let fundsTAG;
+let stateTAG;
+let moneyInPotTAG;
+let cardsTAG;
+
+let username;
+let funds;
+// let seatNumber;
+let playerState;
+let cards;
+
 function insertPlayersIntoHTML( players ) {
     for (let i=1; i<=players.length; i++) {
-        let usernameTAG = document.querySelector("#username_" + i);
-        let fundsTAG = document.querySelector("#funds_" + i);
-        let stateTAG = document.querySelector("#state_" + i);
-        let moneyInPotTAG = document.querySelector("#money_in_pot_" + i);
-        let cardsTAG = document.querySelector("#cards_" + i);
 
-        let username = players[i-1].Username;
-        let funds = players[i-1].Funds;
-        // let seatNumber = players[i-1].SeatNumber;
+        usernameTAG = document.querySelector("#username_" + i);
+        fundsTAG = document.querySelector("#funds_" + i);
+        stateTAG = document.querySelector("#state_" + i);
+        moneyInPotTAG = document.querySelector("#money_in_pot_" + i);
+        cardsTAG = document.querySelector("#cards_" + i);
+
+        username = players[i-1].Username;
+        funds = players[i-1].Funds;
+        // seatNumber = players[i-1].SeatNumber;
         let playerState = players[i-1].PlayerState;
         let moneyInPot = players[i-1].MoneyInPot;
         let cards = players[i-1].Cards;
 
-        if ( usernameTAG.innerHTML === username ) {
+        if ( detectRefresh() ) {
             continue;
         }
+        
         usernameTAG.innerHTML = username;
         fundsTAG.innerHTML = funds;
         stateTAG.innerHTML = playerState;
