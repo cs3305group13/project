@@ -81,6 +81,11 @@ func GivePlayersTheirCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, players
 
 		assignPlayerHisCards(tx, playersTableName, tableID, playerName, playersCard)
 	}
+
+	deckString := cards.DeckString(deck)
+	cardsNotInDeckString := cards.DeckString(cardsNotInDeck)
+
+	refreshDeckAndCardsNotInDeck(tx, tablesTableName, deckString, cardsNotInDeckString, tableID)
 }
 
 func assignPlayerHisCards(tx *sql.Tx, playersTableName, tableID, username, cardsString string) {
