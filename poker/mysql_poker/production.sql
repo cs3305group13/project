@@ -54,4 +54,4 @@ SELECT *
 FROM cs2208_jr30.players;
 
 SELECT *
-FROM poker_tables;
+FROM cs2208_jr30.poker_tables;
