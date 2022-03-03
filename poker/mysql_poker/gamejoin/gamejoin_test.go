@@ -44,7 +44,7 @@ func TestUpdatePlayersSelectedGame(t *testing.T) {
 	tableID := "2"
 	seatNumber := "2" 
 	
-	funds := UpdatePlayersSelectedGame(tx, testingPlayersTableName, tableID, "derek", seatNumber)
+	funds := UpdatePlayersSelectedGame(DB, tx, testingPlayersTableName, tableID, "derek", seatNumber)
 
 	if funds != "30.00" {
 		t.Errorf("Funds should be 30.0 and not %s", funds)

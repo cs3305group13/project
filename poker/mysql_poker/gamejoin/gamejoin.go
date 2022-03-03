@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/cs3305/group13_2022/project/mysql_db"
 	"github.com/cs3305/group13_2022/project/mysql_db/find"
 	"github.com/cs3305/group13_2022/project/mysql_db/insert"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
@@ -23,8 +24,8 @@ func CheckTableExists( tx *sql.Tx, tablesTableName, tableCode string ) bool {
 }
 
 
-func UpdatePlayersSelectedGame(tx *sql.Tx, playersTableName, tableID, username, seatNumber string) (funds string) {
-	userFunds := gameinfo.GetPlayersFunds(tx, playersTableName, username)
+func UpdatePlayersSelectedGame(DB *mysql_db.DB, tx *sql.Tx, playersTableName, tableID, username, seatNumber string) (funds string) {
+	userFunds := gameinfo.GetPlayersFunds(DB, playersTableName, username)
 
 	if userFunds < 5.0 {
 		userFunds = 30.0
