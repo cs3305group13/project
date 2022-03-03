@@ -17,9 +17,8 @@ func TestJSONGameDetails(t *testing.T) {
 	pokerTablesTableName := envs["TESTING_POKER_TABLES_TABLE"]
 
 	tableID := "1"
-	username := "derek"
 
-	details := JSONGameDetails(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
+	details := JSONGameDetails(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 
 	fmt.Println(string(details))
 }

@@ -45,7 +45,7 @@ func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, 
 	res, err := tx.Exec(query)
 	utils.CheckError(err)
 
-	numberOfRowsAffected := utils.GetNumberOfRowsAffected(res)
+	numOfRowsAffected := utils.GetNumberOfRowsAffected(res)
 	if numOfRowsAffected == 0 {
 		return false
 	} else if utils.GetNumberOfRowsAffected(res) != 1 {
@@ -56,7 +56,7 @@ func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, 
 }
 
 // function used to assign player as new current_player_making_move, dealer, or highest_bidder in either poker tables or tables.
-func AssignThisPlayerToRole(tx *sql.Tx, tableName, tableId, username, setOperation string) {
+func AssignThisPlayerToRole(tx *sql.Tx, tableName, tableID, username, setOperation string) {
 	query := fmt.Sprintf(`UPDATE %s
 						  SET %s
 						  WHERE table_id = %s;`, tableName, setOperation, tableID)
