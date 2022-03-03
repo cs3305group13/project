@@ -20,20 +20,17 @@ func GetCurrentPlayerMakingMove(DB *mysql_db.DB, tablesTableName, playersTableNa
 
 	err := db.QueryRow(query).Scan(&currentPlayerMakingMove)
 	if err != sql.ErrNoRows {
-		fmt.Println("Error: " + err.Error())
-	utils.CheckError(err)
+		utils.CheckError(err)
 	}
-
+	
 	query = fmt.Sprintf(`SELECT seat_number
 	                     FROM %s
 						 WHERE table_id = %s AND username = "%s";`, playersTableName, tableID, currentPlayerMakingMove)
-
+	
 	err = db.QueryRow(query).Scan(&seatNumber)
 	if err != sql.ErrNoRows {
-		fmt.Println("Error: " + err.Error())
 		utils.CheckError(err)
 	}
-
 
 
 	return currentPlayerMakingMove, seatNumber
