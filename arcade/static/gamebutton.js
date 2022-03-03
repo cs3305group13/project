@@ -11,8 +11,6 @@ let raiseButton;
 
 let chipsTextField;
 
-// let usernameDiv;
-// let seatNumberDiv;
 
 function init() {
 
@@ -21,13 +19,30 @@ function init() {
     checkButton = document.querySelector("#check_button");
     raiseButton = document.querySelector("#raise_button");
 
-    chipsTextField = document.querySelector("chips_text_field");
+    chipsTextField = document.querySelector("amount");
 
     // usernameDiv = document.querySelector("#username_div");
     currentPlayerMakingMove = document.querySelector("#current_player_making_move");
 
     readyButton = document.querySelector("#ready_button");
     readyButton.addEventListener( "click", ListenReadyUpButton, false );
+
+    foldButton = document.querySelector("#fold_button"); 
+    foldButton.addEventListener("click", ListenActionButton, false);  
+
+    checkButton = document.querySelector("check_button");
+    checkButton.addEventListener("click", ListenActionButton, false);
+
+    callButton = document.querySelector("#call_button");
+    callButton.addEventListener("click", ListenActionButton, false);
+
+    raiseButton = document.querySelector("#raise_button");
+    raiseButton.addEventListener("click", ListenActionButton, false);
+}
+
+function ListenActionButton(event) {
+    let request = "action=" + event.target.value + "&amount" + chipsTextField.value;
+    sendUserRequest(request);
 }
 
 function ListenReadyUpButton() {

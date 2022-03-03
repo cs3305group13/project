@@ -36,6 +36,7 @@ func main() {
 func pokerHandlers() {
 	http.HandleFunc("/pokertable", poker.HandlePokerTableRequest)
 	http.HandleFunc("/content_request", poker.HandleContentAjaxRequest)
+	http.HandleFunc("/user_request", poker.HandleUserAjaxRequest)
 }
 func sidescrollerHandlers() {
 	http.HandleFunc("/adventure_game", sidescroller.HandleSideScrollerPage)

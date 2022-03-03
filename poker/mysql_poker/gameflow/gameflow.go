@@ -33,7 +33,7 @@ func UpdateUsersTimeSinceRequest(DB *mysql_db.DB, tablesTableName, playersTableN
 // Method used to update next player who holds the responsibility.
 // 
 // setOperation := "highest_bidder = "
-func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, playersTableName, tableID, username, seatNumber, setOperation string) {
+func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, playersTableName, tableID, username, seatNumber, setOperation string) (successful bool ) {
 	playerName := NextAvailablePlayer(DB, playersTableName, tableID, username, seatNumber)
 	setOperation += fmt.Sprintf(`"%s"`, playerName)
 
@@ -45,10 +45,31 @@ func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, 
 	res, err := tx.Exec(query)
 	utils.CheckError(err)
 
-	if utils.GetNumberOfRowsAffected(res) != 1 {
+	numberOfRowsAffected := utils.GetNumberOfRowsAffected(res)
+	if numOfRowsAffected == 0 {
+		return false
+	} else if utils.GetNumberOfRowsAffected(res) != 1 {
 		panic("One and only one row should have been affected")
+	} else {
+		return true
 	}
 }
+
+// function used to assign player as new current_player_making_move, dealer, or highest_bidder in either poker tables or tables.
+func AssignThisPlayerToRole(tx *sql.Tx, tableName, tableId, username, setOperation string) {
+	query := fmt.Sprintf(`UPDATE %s
+						  SET %s
+						  WHERE table_id = %s;`, tableName, setOperation, tableID)
+
+	res, err := tx.Exec(query)
+
+	utils.CheckError(err)
+
+	rowsAffected := utils.GetNumberOfRowsAffected(res)
+	if rowsAffected != 1 {
+		panic("A change should have been caused unless method is used for wrong intention")
+	}
+} 
 
 // return next available players who are not idle nor in 'NOT_READY', 'LEFT', 'FOLDED', and 'ALL_IN' state.
 func NextAvailablePlayers(DB *mysql_db.DB, playersTableName, tableID, username, seatNumber string) (playerNames []string) {

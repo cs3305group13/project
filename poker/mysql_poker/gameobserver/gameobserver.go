@@ -15,11 +15,13 @@ import (
 func GameObserver(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
 
 	numOfPlayers := gameinfo.GetNumberOfPlayersAtTable( DB, playersTableName, tableID )  // check how many players are in game.
-	for numOfPlayers != 0 {
 		db := mysql_db.EstablishConnection(DB)
-		tx := mysql_db.NewTransaction(db)
 		defer tx.Rollback()
 		defer db.Close()
+
+		for numOfPlayers != 0 {
+			tx = mysql_db.NewTransaction(db)
+		}
 		
 		removeIdleUsers(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID )
 		
