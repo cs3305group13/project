@@ -84,7 +84,7 @@ These are discussed in more detail in later sections
     * Deadlocks still may occur in grey areas such as during start game sequence. (Basically any time a user performs an action and quickly they or someone else performs another action, this may trigger a deadlock due to a transaction still being executed, very unlikely though.)
   
   * ### **Bugs**
-    * During testing it was seen users using a Safari browser would be kicked after some time for being idle whereas browsers like Google Chrome, Brave Browser and FireFox would be mostly unaffected. This may be due to ajax http request prioritisation given to the default browser, we had were using Google Chrome.
+    * During testing it was seen users using a Safari browser would be kicked after some time for being idle whereas browsers like Google Chrome, Brave Browser and FireFox would be mostly unaffected. This may be due to ajax http request prioritisation given to the default browser, we were using Google Chrome.
 
 --- 
 
