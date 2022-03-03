@@ -33,7 +33,7 @@ func UpdateUsersTimeSinceRequest(DB *mysql_db.DB, tablesTableName, playersTableN
 // Method used to update next player who holds the responsibility.
 // 
 // setOperation := "highest_bidder = "
-func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, playersTableName, tableID, username, seatNumber, setOperation string) {
+func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, playersTableName, tableID, username, seatNumber, setOperation string) (successful bool ) {
 	playerName := NextAvailablePlayer(DB, playersTableName, tableID, username, seatNumber)
 	setOperation += fmt.Sprintf(`"%s"`, playerName)
 
@@ -45,8 +45,13 @@ func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, 
 	res, err := tx.Exec(query)
 	utils.CheckError(err)
 
-	if utils.GetNumberOfRowsAffected(res) != 1 {
+	numberOfRowsAffected := utils.GetNumberOfRowsAffected(res)
+	if numOfRowsAffected == 0 {
+		return false
+	} else if utils.GetNumberOfRowsAffected(res) != 1 {
 		panic("One and only one row should have been affected")
+	} else {
+		return true
 	}
 }
 
