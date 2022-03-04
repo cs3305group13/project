@@ -8,13 +8,15 @@ import (
 	"github.com/cs3305/group13_2022/project/mysql_db"
 	"github.com/cs3305/group13_2022/project/mysql_db/crypto"
 	"github.com/cs3305/group13_2022/project/mysql_db/find"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gamejoin"
 
 	"github.com/cs3305/group13_2022/project/utils/env"
 	"github.com/cs3305/group13_2022/project/utils/token"
 )
 
+// If url contains `/signup` then request is directed here for handling
 func HandleSignupPage(w http.ResponseWriter, r *http.Request) {
-	envs := env.GetEnvironmentVariables("../../../.env")
+	envs := env.GetEnvironmentVariables("../../../production.env")
 
 	if signupFormOk(w, r, envs) { 
 		username := html.EscapeString(r.Form.Get("username"))
@@ -82,21 +84,31 @@ func signupFormOk(w http.ResponseWriter, r *http.Request, envs map[string]string
 	defer db.Close()
 
 	usersTableName := envs["USER_CREDENTIALS_TABLE"]
+
+	// Checks if these credentials already exist
 	userFound := find.FindRowByValue(tx, usersTableName, "username", username, "username")
 
-	if userFound != "" {
-		problems.GeneralProblem = "The username provided already has an account. Login <a href='/signup'>Here</a>"
+	if userFound != "" {  // if user found then signup page is reattached along with reason for failure
+
+		problems.GeneralProblem = `The username provided already has an account. Login <a href="/signup">Here</a>`
 		attachSignupPage( w, problems )
 		return false
 	}
 
 	successfullyAdded := crypto.AddUser(tx, usersTableName, username, password_00)
-	if successfullyAdded == false {
+	playerFunds := envs["PLAYER_FUNDS"]
+
+	playersTableName := envs["PLAYERS_TABLE"]
+	successfullyAddedPlayer := gamejoin.AddPlayer(tx, playersTableName, username, playerFunds)
+
+	if ! successfullyAdded || ! successfullyAddedPlayer {  // if user is unsuccessfully added then signup page along with reason for failure are attached
+
 		problems.GeneralProblem = "We experienced a problem signing you up. Try again or come back later."
 		attachSignupPage( w, problems )
 		return false
 	}
-	tx.Commit()
+
+	tx.Commit() // commit transaction
 
 	// If at this point all went well, user granted access and also NOTHING was written to `w` responseWriter.
 	return true
