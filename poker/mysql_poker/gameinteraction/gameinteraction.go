@@ -27,10 +27,6 @@ func GameInProgress(w http.ResponseWriter, DB *mysql_db.DB, tablesTableName, tab
 
 	utils.CheckError(err)
 
-	if gameState {
-		w.Write([]byte("MESSAGE:\nSorry game is in progress, should be over soon."))
-	}
-
 	return gameState
 }
 
@@ -157,17 +153,42 @@ func playerRaised( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableNam
 	TryTakeMoneyFromPlayer(DB, tx, playersTableName, tableID, username, raiseAmount)
 	gameflow.AssignThisPlayerToRole(tx, pokerTablesTableName, tableID, username, setOperation)
 
+	query := fmt.Sprintf(`UPDATE %s
+	                      SET player_state = "RAISED"
+						  WHERE username = "%s";`, playersTableName, username)
+
+	_, err := tx.Exec(query)
+	if err != sql.ErrNoRows {
+		utils.CheckError(err)
+	}
+
 	return true
 }
 
 func playerCalled( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, raiseAmount string ) bool {
 
+	query := fmt.Sprintf(`UPDATE %s
+	                      SET player_state = "CALLED"
+						  WHERE username = "%s";`, playersTableName, username)
+
+	_, err := tx.Exec(query)
+	if err != sql.ErrNoRows {
+		utils.CheckError(err)
+	}
 
 	return true
 }
 
 func playerChecked( DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username string ) bool {
 
+	query := fmt.Sprintf(`UPDATE %s
+	                      SET player_state = "CHECKED"
+						  WHERE username = "%s";`, playersTableName, username)
+
+	_, err := tx.Exec(query)
+	if err != sql.ErrNoRows {
+		utils.CheckError(err)
+	}
 
 	return true
 }
