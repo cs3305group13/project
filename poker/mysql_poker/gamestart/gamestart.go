@@ -123,8 +123,8 @@ func beginGame(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, p
 
 	smallBlindAmount := "1.0"
 	bigBlindAmount := "2.0"
-	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, tx, playersTableName, tableID, smallBlind, smallBlindAmount)
-	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, tx, playersTableName, tableID, bigBlind, bigBlindAmount)
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, tx, playersTableName, pokerTablesTableName, tableID, smallBlind, smallBlindAmount)
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, tx, playersTableName, pokerTablesTableName, tableID, bigBlind, bigBlindAmount)
 
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()

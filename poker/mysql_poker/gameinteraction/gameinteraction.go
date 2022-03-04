@@ -22,16 +22,7 @@ func GameInProgress(w http.ResponseWriter, DB *mysql_db.DB, tablesTableName, tab
 	                      FROM %s
 						  WHERE table_id = "%s"`, tablesTableName, tableID)
 
-	var gameState bool
-	err := db.QueryRow(query).Scan(&gameState)
-
-	utils.CheckError(err)
-
-	return gameState
-}
-
-
-func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, tableID, playerName, bid string) (taken bool) {
+func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, pokerTablesTableName, tableID, playerName, bid string) (taken bool) {
 	playersFunds := gameinfo.GetPlayersFunds(DB, playersTableName, playerName)
 	
 	playersBid, err := strconv.ParseFloat(bid, 64)
@@ -43,15 +34,12 @@ func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, table
 	}
 
 	query := fmt.Sprintf(`UPDATE %s
-	                      SET funds = funds - %v
-						  WHERE username = "%s";`, playersTableName, playersBid, playerName)
-	res, err := tx.Exec(query)
+	_, err = tx.Exec(query)
 	utils.CheckError(err)
 
-	rowsAffected := utils.GetNumberOfRowsAffected(res)
-	if rowsAffected != 1 {
-		panic("exactly one row should have been affected")
-	}
+	query = fmt.Sprintf(`UPDATE %s
+	                     SET money_in_pot = money_in_pot + %v
+						 WHERE table_id = %s;`, pokerTablesTableName, bid, tableID)
 
 	taken = true
 	return taken

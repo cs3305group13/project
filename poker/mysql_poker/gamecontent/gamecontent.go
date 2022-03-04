@@ -79,6 +79,7 @@ type tableDetails struct {
 	CurrentPlayerMakingMove string
 	GameState string
 	CommunityCards string
+	MoneyInPot string
 }
 
 func getTableDetails( DB *mysql_db.DB, tablesTableName, pokerTablesTableName, tableID string ) *tableDetails {
@@ -94,11 +95,11 @@ func getTableDetails( DB *mysql_db.DB, tablesTableName, pokerTablesTableName, ta
 	                               &tableDetails.GameState)
 	utils.CheckError(err)
 
-	query = fmt.Sprintf(`SELECT community_cards
+	query = fmt.Sprintf(`SELECT community_cards, money_in_pot
 	                     FROM %s
 						 WHERE table_id = %s`, pokerTablesTableName, tableID)
 
-	err = db.QueryRow(query).Scan(&tableDetails.CommunityCards)
+	err = db.QueryRow(query).Scan(&tableDetails.CommunityCards, &tableDetails.MoneyInPot)
 	
 	utils.CheckError(err)
 
