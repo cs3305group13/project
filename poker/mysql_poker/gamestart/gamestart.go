@@ -21,7 +21,7 @@ func TryReadyUpPlayer(w http.ResponseWriter, r *http.Request, DB *mysql_db.DB, t
 
 	tableID := token.GetTableID(r, "token")
 
-	if gameinteraction.GameInProgress(w, DB, tablesTableName, tableID) { // aka not everyone is ready
+	if gameinfo.GameInProgress(DB, tablesTableName, tableID) { // aka not everyone is ready
 		w.Write([]byte("MESSAGE:\nGame is in progress."))
 		return 
 
@@ -131,8 +131,9 @@ func beginGame(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, p
 
 	// initialize the big blind as the highest bidder
 	query := fmt.Sprintf(`UPDATE %s
-						  SET highest_bidder = "%s"
-						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, tableID)
+						  SET highest_bidder = "%s",
+						      highest_bid = "%s"
+						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, bigBlindAmount, tableID)
 
 	_, err := tx.Exec(query)  // result is ignored because TryTakeMoneyFromPlayers updates highestBidder
 
