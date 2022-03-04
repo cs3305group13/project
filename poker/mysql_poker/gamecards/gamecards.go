@@ -27,6 +27,7 @@ func AddToCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTa
 		cardsToAdd = cards.TakeCard(deck, cardsNotInDeck)
 	} else {
 		gameshowdown.ShowDown(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+		return
 	}
 
     // reassign deckString with deck without taken card
