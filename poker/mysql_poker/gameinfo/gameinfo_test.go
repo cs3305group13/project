@@ -152,3 +152,11 @@ func TestGetHighestBidder(t *testing.T) {
 		t.Error("bidders name could not be retrieved")
 	}
 }
+
+
+func TestGetCommunityCards(t *testing.T) {
+
+	tableID := "1"
+
+	GetCommunityCards(DB, testingPokerTableName, tableID)
+}

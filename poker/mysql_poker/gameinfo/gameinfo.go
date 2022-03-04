@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/cs3305/group13_2022/project/cards"
 	"github.com/cs3305/group13_2022/project/mysql_db"
 	"github.com/cs3305/group13_2022/project/utils"
 )
@@ -220,4 +221,22 @@ func GetPlayersMoneyInPot(DB *mysql_db.DB, playersTableName, username string) (m
 	utils.CheckError(err)
 
 	return moneyInPot
+}
+
+
+func GetCommunityCards(DB *mysql_db.DB, pokerTablesTableName, tableID string) (communityCards *cards.Deck) {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	query := fmt.Sprintf(`SELECT community_cards
+	                      FROM %s
+						  WHERE table_id = %s`, pokerTablesTableName, tableID)
+
+	var communityCardsString string
+	err := db.QueryRow(query).Scan(&communityCardsString)
+	utils.CheckError(err)
+
+	communityCards = cards.ExtractDeck(communityCardsString)
+
+	return communityCards
 }
