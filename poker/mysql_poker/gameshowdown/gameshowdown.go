@@ -49,10 +49,10 @@ func ShowDown(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, po
 
 	// decide winner
 	var winner string
-	var highestScore int
+	bestScore := 10000  // the lower the number the better the hand
 	for i:=0; i<len(players); i++ {
-		if highestScore > players[i].score {
-		    highestScore = players[i].score
+		if bestScore > players[i].score {
+		    bestScore = players[i].score
 			winner = players[i].username
 		}
 
@@ -82,9 +82,8 @@ func GetPlayersAndCards(DB *mysql_db.DB, playersTableName, tableID string) (play
 	rows, err := db.Query(query)
 	utils.CheckError(err)
 	
-	
+	var p player
 	for rows.Next() {
-		var p player
 		err := rows.Scan(&p.username, &p.cards)
 		utils.CheckError(err)
 
