@@ -15,7 +15,7 @@ import (
 //
 // example:
 // columnNames = "id, a, b, c"
-// values = "1, 2, 3, 4"
+// values = '"1", "2", "3", "4"'
 //
 func InsertTableEntry(tx *sql.Tx, tableName, columnNames, values string) (tableID int64, inserted bool) {
 	var updateOperation string
@@ -33,6 +33,7 @@ func InsertTableEntry(tx *sql.Tx, tableName, columnNames, values string) (tableI
 	var query = fmt.Sprintf(`INSERT INTO %s (%s)
 	                         VALUES (%s)
 							 ON DUPLICATE KEY UPDATE %s;`, tableName, columnNames, values, updateOperation)
+
 
 	res, err := tx.Exec(query)
 	
