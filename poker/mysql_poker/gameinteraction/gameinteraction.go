@@ -66,7 +66,7 @@ func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName
 		// give player pot
 		return
 	} else if ! nextPlayerFoundBool && numberOfPlayersStillPlaying > 1{
-		gameshowdown.ShowDown(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+		gameshowdown.ShowDown(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 	}else {
 		// if here then there are still other players playing therefore this player can fold
 
