@@ -73,7 +73,7 @@ VALUES (1, DATE_SUB(NOW(), INTERVAL 48 HOUR), "barry", "Ah2h3h4h5h6h7h8h9hThJhQh
 
 DELETE FROM cs2208_jr30.dummy_poker_tables;
 INSERT INTO cs2208_jr30.dummy_poker_tables
-VALUES (1, "QsKsAsKhJc", "john", 1.0, "derek", 1.0);
+VALUES (1, "QsKsAs", "john", 1.0, "derek", 1.0);
 
 
 
