@@ -97,13 +97,23 @@ func getEndOfGameCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, pl
 }
 
 
-func SetWinner(DB *mysql_db.DB, tx *sql.Tx, playersTableName, pokerTablesTableName, tableID, username string) {
-	
-	query := fmt.Sprintf(`UPDATE %s
-	                      SET player_state = "WINNER"
-						  WHERE table_id = %s AND username = "%s";`, playersTableName, tableID, username)
+func SetWinner(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username string) {
 
-	_, err := tx.Exec(query)
+	query := fmt.Sprintf(`SELECT money_in_pot
+	                      FROM %s
+						  WHERE table_id = %s;`, pokerTablesTableName, tableID)
+
+	var moneyInPot string
+	err := tx.QueryRow(query).Scan(&moneyInPot)
+
+	utils.CheckError(err)
+	
+	query = fmt.Sprintf(`UPDATE %s
+	                     SET player_state = "WINNER",
+						     funds = funds + %s
+						 WHERE table_id = %s AND username = "%s";`, playersTableName, moneyInPot, tableID, username)
+
+	_, err = tx.Exec(query)
 
 	if err != sql.ErrNoRows {
 	    utils.CheckError(err)
