@@ -8,12 +8,11 @@ import (
 	"github.com/cs3305/group13_2022/project/mysql_db"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameflow"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
-	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameshowdown"
 	"github.com/cs3305/group13_2022/project/utils"
 )
 
 
-func AddToCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
+func AddToCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string, gameEndedEarly bool) bool {
 	deck, cardsNotInDeck := getCards(DB, tablesTableName, tableID)
 
 	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
@@ -23,11 +22,20 @@ func AddToCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTa
 		for i:=0; i<3; i++ {
 			cardsToAdd += cards.TakeCard(deck, cardsNotInDeck)
 		}
+
+	} else if gameEndedEarly {
+		i := len(*communityCards)
+		for i < 5 {
+			i += 1
+			cardsToAdd += cards.TakeCard(deck, cardsNotInDeck)
+		}
+		return false
+
 	} else if 5 > len(*communityCards) && len(*communityCards) >= 3  {
 		cardsToAdd = cards.TakeCard(deck, cardsNotInDeck)
+
 	} else {
-		gameshowdown.ShowDown(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
-		return
+		return false
 	}
 
     // reassign deckString with deck without taken card
@@ -36,8 +44,10 @@ func AddToCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTa
 	cardsNotInDeckString := cards.DeckString(cardsNotInDeck)
 
 	refreshDeckAndCardsNotInDeck(tx, tablesTableName, deckString, cardsNotInDeckString, tableID)
+	
 	addCards(tx, pokerTablesTableName, tableID, cardsToAdd)
 	
+	return true
 }
 
 

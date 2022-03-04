@@ -86,9 +86,24 @@ func TestAddToCommunityCards(t *testing.T) {
 	tx := mysql_db.NewTransaction(db)
 	defer tx.Rollback()
 	defer db.Close()
+	
+	tableID := "1"
+	gameEndedEarly := false
+
+	AddToCommunityCards(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTableName, tableID, gameEndedEarly)
+
+}
+
+func TestAddToCommunityCards_gameEndedEarly(t *testing.T) {
+
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
 
 	tableID := "1"
+	gameEndedEarly := true
 
-	AddToCommunityCards(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTableName, tableID)
+	AddToCommunityCards(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTableName, tableID, gameEndedEarly)
 }
 
