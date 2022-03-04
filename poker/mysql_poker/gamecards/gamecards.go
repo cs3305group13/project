@@ -8,14 +8,15 @@ import (
 	"github.com/cs3305/group13_2022/project/mysql_db"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameflow"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameshowdown"
 	"github.com/cs3305/group13_2022/project/utils"
 )
 
 
-func AddToCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, pokerTablesTableName, tableID string) {
+func AddToCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
 	deck, cardsNotInDeck := getCards(DB, tablesTableName, tableID)
 
-	communityCards := getCommunityCards(DB, pokerTablesTableName, tableID)
+	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
 
 	var cardsToAdd string
 	if len(*communityCards) == 0 {
@@ -25,7 +26,7 @@ func AddToCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, pokerTabl
 	} else if 5 > len(*communityCards) && len(*communityCards) >= 3  {
 		cardsToAdd = cards.TakeCard(deck, cardsNotInDeck)
 	} else {
-		panic("Can only add cards if there are no cards and as long as there are no more than 4 cards.")
+		gameshowdown.ShowDown(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 	}
 
     // reassign deckString with deck without taken card
@@ -38,22 +39,7 @@ func AddToCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, pokerTabl
 	
 }
 
-func getCommunityCards(DB *mysql_db.DB, pokerTablesTableName, tableID string) (communityCards *cards.Deck) {
-	db := mysql_db.EstablishConnection(DB)
-	defer db.Close()
 
-	query := fmt.Sprintf(`SELECT community_cards
-	                      FROM %s
-						  WHERE table_id = %s`, pokerTablesTableName, tableID)
-
-	var communityCardsString string
-	err := db.QueryRow(query).Scan(&communityCardsString)
-	utils.CheckError(err)
-
-	communityCards = cards.ExtractDeck(communityCardsString)
-
-	return communityCards
-}
 
 func GivePlayersTheirCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, tableID string) {
 	deck, cardsNotInDeck := getCards(DB, tablesTableName, tableID)

@@ -26,7 +26,7 @@ func TestAddCards(t *testing.T) {
 	defer db.Close()
 
 	tableID := "1"
-	cardsToAdd := "2H10CAH"
+	cardsToAdd := "2HTCAH"
 
 	addCards(tx, testingPokerTableName, tableID, cardsToAdd)
 }
@@ -37,8 +37,8 @@ func TestRefreshDeckAndCardsNotInDeck(t *testing.T) {
 	defer tx.Rollback()
 	defer db.Close()
 
-	deckString := "AH2H3H4H5H6H7H8H9H10HJHQHKHAD2D3D4D5D6D7D8D9D10DJDQDKDAS2S3S4S5S6S7S8S9S10SJSQSKSAC2C3C4C5C6C7C8C9C10CJCKC"
-	cardsNotInDeckString := "QC"
+	deckString := "AH2H3H4H5H6H7H8H9HTHJHQHKHAD2D3D4D5D6D7D8D9DTDJDQDKDAS2S3S4S5S6S7S8S9STSJSQSKSAC2C3C4C5C6C7C8C9CTCJCQCKC"
+	cardsNotInDeckString := ""
 	tableID := "1"
 
 	refreshDeckAndCardsNotInDeck(tx, testingTablesTableName, deckString, cardsNotInDeckString, tableID)
@@ -79,12 +79,6 @@ func TestGivePlayersTheirCards(t *testing.T) {
 	GivePlayersTheirCards(DB, tx, testingTablesTableName, testingPlayersTableName, tableID)
 }
 
-func TestGetCommunityCards(t *testing.T) {
-
-	tableID := "1"
-
-	getCommunityCards(DB, testingPokerTableName, tableID)
-}
 
 func TestAddToCommunityCards(t *testing.T) {
 
@@ -95,6 +89,6 @@ func TestAddToCommunityCards(t *testing.T) {
 
 	tableID := "1"
 
-	AddToCommunityCards(DB, tx, testingTablesTableName, testingPokerTableName, tableID)
+	AddToCommunityCards(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTableName, tableID)
 }
 
