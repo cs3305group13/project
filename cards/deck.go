@@ -5,8 +5,8 @@ import (
 	"math/big"
 )
 
-var availableValues = []string{"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"}
-var availableSuits = []string{"H", "D", "S", "C"}
+var availableValues = []string{"A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"}
+var availableSuits = []string{"h", "d", "s", "c"}
 
 type Deck []string
 
