@@ -107,24 +107,44 @@ function detectRefresh() {
 function insertDetailsIntoHTML( tableDetails ) {
     communityCardsTAG = document.querySelector("#community_cards");
     currentPlayerMakingMoveTAG = document.querySelector("#current_player_making_move");
-    gameStateTAG = document.querySelector("#game_state");
+    moneyInPotTAG = document.querySelector("#money_in_pot")
 
     communityCards = tableDetails.CommunityCards;
     currentPlayerMakingMove = tableDetails.CurrentPlayerMakingMove;
-    gameState = tableDetails.GameState;
+    moneyInPot = tableDetails.MoneyInPot;
 
     communityCardsTAG.innerHTML = communityCards;
     currentPlayerMakingMoveTAG.innerHTML = currentPlayerMakingMove;
-    gameState.innerHTML = gameState;
+    moneyInPotTAG.innerHTML = moneyInPot;
 
     hiddenUsernameTAG = document.querySelector("#hidden_username_tag");
     hiddenSeatNumberTAG = document.querySelector("#hidden_seatnumber_tag");
 
     SeatTAG = document.querySelector("#seat_" + hiddenSeatNumberTAG.innerHTML);
 
-    if ( hiddenUsernameTAG.innerHTML === currentPlayerMakingMoveTAG.innerHTML ) {
+    gameState = tableDetails.GameState;
+
+    let gameButtonsFormTAG = document.querySelector("#game_buttons_form");
+    if ( hiddenUsernameTAG.innerHTML === currentPlayerMakingMoveTAG.innerHTML && gameState == 1 ) {
         SeatTAG.style.backgroundColor = "cadetblue";
+        gameButtonsFormTAG.style.display = "block";
+        
     } else {
         SeatTAG.style.backgroundColor = "blue";
+        gameButtonsFormTAG.style.display = "none";
     }
+
+    
+    let readyButtonFormTAG = document.querySelector("#player_state_button_form");
+    if (gameState == "1" ) { // aka. game is in progress
+        readyButtonFormTAG.style.display = "none";
+
+    } else {
+        readyButtonFormTAG.style.display = "block";
+    }
+}
+
+
+function HandleUserButtonDisplay() {
+    
 }
