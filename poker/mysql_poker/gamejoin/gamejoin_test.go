@@ -16,6 +16,20 @@ var testingPlayersTableName = envs["TESTING_PLAYERS_TABLE"]
 var testingPokerTableName = envs["TESTING_POKER_TABLES_TABLE"]
 
 
+func TestAddPlayer(t *testing.T) {
+
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	username := "declan"
+	funds := "30.0"
+
+
+	AddPlayer(tx, testingPlayersTableName, username, funds)
+}
+
 
 func TestCheckTableExists(t *testing.T) {
 	
