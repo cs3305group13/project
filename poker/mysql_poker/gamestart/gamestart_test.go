@@ -44,16 +44,15 @@ func TestFindWhoShouldBeSmallAndBigBlind(t *testing.T) {
 
 func TestBeginGame(t *testing.T) {
 
-	db := mysql_db.EstablishConnection(DB)
-	tx := mysql_db.NewTransaction(db)
-	defer tx.Rollback()
-	defer db.Close()
+	mysql_poker.RefreshTablesTable(DB)
+	mysql_poker.RefreshPlayerTable(DB)
+	mysql_poker.RefreshPokerTable(DB)
 
 	tableID := "1"
 
 	mysql_poker.RefreshPlayers(DB, testingPlayersTableName)
 
-	beginGame(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID)
+	beginGame(DB, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID)
 }
 
 func TestReadyUpPlayer(t *testing.T) {
@@ -79,4 +78,17 @@ func TestStartGame(t *testing.T) {
 	tableID := "1"
 
 	startGame(tx, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID)
+}
+
+func TestTryReadyUpPlayer(t *testing.T) {
+	mysql_poker.RefreshTablesTable(DB)
+	mysql_poker.RefreshPlayerTable(DB)
+	mysql_poker.RefreshPokerTable(DB)
+
+	tableID := "1"
+	gameState := "false"
+
+	mysql_poker.SetGameInProgress(DB, gameState, tableID)
+
+	TryReadyUpPlayer(w, r, DB, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName)
 }

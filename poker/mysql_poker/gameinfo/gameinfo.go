@@ -5,9 +5,28 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/cs3305/group13_2022/project/cards"
 	"github.com/cs3305/group13_2022/project/mysql_db"
 	"github.com/cs3305/group13_2022/project/utils"
 )
+
+func GameInProgress( DB *mysql_db.DB, tablesTableName, tableID string ) bool {
+	
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	query := fmt.Sprintf(`SELECT game_in_progress
+	                      FROM %s
+						  WHERE table_id = "%s";`, tablesTableName, tableID)
+
+	var gameState bool
+	err := db.QueryRow(query).Scan(&gameState)
+
+	utils.CheckError(err)
+
+	return gameState
+}
+
 
 func GetCurrentPlayerMakingMove(DB *mysql_db.DB, tablesTableName, playersTableName, tableID string) (currentPlayerMakingMove, seatNumber string) {
 
@@ -20,20 +39,17 @@ func GetCurrentPlayerMakingMove(DB *mysql_db.DB, tablesTableName, playersTableNa
 
 	err := db.QueryRow(query).Scan(&currentPlayerMakingMove)
 	if err != sql.ErrNoRows {
-		fmt.Println("Error: " + err.Error())
-	utils.CheckError(err)
+		utils.CheckError(err)
 	}
-
+	
 	query = fmt.Sprintf(`SELECT seat_number
 	                     FROM %s
 						 WHERE table_id = %s AND username = "%s";`, playersTableName, tableID, currentPlayerMakingMove)
-
+	
 	err = db.QueryRow(query).Scan(&seatNumber)
 	if err != sql.ErrNoRows {
-		fmt.Println("Error: " + err.Error())
 		utils.CheckError(err)
 	}
-
 
 
 	return currentPlayerMakingMove, seatNumber
@@ -88,6 +104,37 @@ func GetHighestBidder(DB *mysql_db.DB, pokerTablesTableName, tableID string) (bi
 	utils.CheckError(err)
 
 	return bidder, bid
+}
+
+
+type player struct {
+	Username string
+	Cards string
+	Score int
+}
+// Gets (playing, allin, raised, called, checked) players and their cards
+func GetPlayersAndCards(DB *mysql_db.DB, playersTableName, tableID string) (players []player) {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	query := fmt.Sprintf(`SELECT username, player_cards
+	                      FROM %s
+						  WHERE table_id = %s AND 
+						       player_state IN ("PLAYING", "ALL_IN", "RAISED", "CALLED", "CHECKED");`, playersTableName, tableID)
+
+	
+	rows, err := db.Query(query)
+	utils.CheckError(err)
+	
+	var p player
+	for rows.Next() {
+		err := rows.Scan(&p.Username, &p.Cards)
+		utils.CheckError(err)
+
+		players = append(players, p)
+	}
+
+	return players
 }
 
 // Gets total number of players regardless of playerState
@@ -191,4 +238,36 @@ func GetPlayersFunds(DB *mysql_db.DB, playersTableName, username string) (funds 
 	utils.CheckError(err)
 
 	return funds
+}
+
+func GetPlayersMoneyInPot(DB *mysql_db.DB, playersTableName, username string) (moneyInPot float64) {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+	
+	query := fmt.Sprintf(`SELECT money_in_pot
+	                      FROM %s
+						  WHERE username = "%s"`, playersTableName, username)
+
+	err := db.QueryRow(query).Scan(&moneyInPot)
+	utils.CheckError(err)
+
+	return moneyInPot
+}
+
+
+func GetCommunityCards(DB *mysql_db.DB, pokerTablesTableName, tableID string) (communityCards *cards.Deck) {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	query := fmt.Sprintf(`SELECT community_cards
+	                      FROM %s
+						  WHERE table_id = %s`, pokerTablesTableName, tableID)
+
+	var communityCardsString string
+	err := db.QueryRow(query).Scan(&communityCardsString)
+	utils.CheckError(err)
+
+	communityCards = cards.ExtractDeck(communityCardsString)
+
+	return communityCards
 }

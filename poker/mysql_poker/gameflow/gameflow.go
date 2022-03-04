@@ -1,24 +1,23 @@
 package gameflow
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/mysql_poker/gameinfo"
 	"github.com/cs3305/group13_2022/project/utils"
 )
 
 // function refreshes users time_since_request and checks/removes any players are idle
 func UpdateUsersTimeSinceRequest(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, username, tableID, seatNumber string) {
+	
 	db := mysql_db.EstablishConnection(DB)
-	tx := mysql_db.NewTransaction(db)
-	defer tx.Rollback()
 	defer db.Close()
 
 	query := fmt.Sprintf(`UPDATE %s
 	                      SET time_since_request = CURRENT_TIMESTAMP()
 						  WHERE username = "%s";`, playersTableName, username)
-	res, err := tx.Exec(query)
+	res, err := db.Exec(query)
 	utils.CheckError(err)
 
 	numberOfRowsAffected := utils.GetNumberOfRowsAffected(res)
@@ -27,14 +26,17 @@ func UpdateUsersTimeSinceRequest(DB *mysql_db.DB, tablesTableName, playersTableN
 		panic("Exactly one row should have been affected.")
 	}
 
-	tx.Commit()
 }
 
 // Method used to update next player who holds the responsibility.
 // 
 // setOperation := "highest_bidder = "
-func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, playersTableName, tableID, username, seatNumber, setOperation string) (successful bool ) {
+func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tableName, playersTableName, tableID, username, seatNumber, setOperation string) (successful bool ) {
 	playerName := NextAvailablePlayer(DB, playersTableName, tableID, username, seatNumber)
+
+	db := mysql_db.EstablishConnection(DB)
+	defer db.close()
+
 	setOperation += fmt.Sprintf(`"%s"`, playerName)
 
 	query := fmt.Sprintf(`UPDATE %s
@@ -42,26 +44,30 @@ func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, 
 						  WHERE table_id = %s;`, tableName, setOperation, tableID)
 
 
-	res, err := tx.Exec(query)
+	res, err := db.Exec(query)
 	utils.CheckError(err)
 
 	numberOfRowsAffected := utils.GetNumberOfRowsAffected(res)
+
 	if numOfRowsAffected == 0 {
+		// if here player was reassigned his role therefore no changes encountered.
 		return false
-	} else if utils.GetNumberOfRowsAffected(res) != 1 {
-		panic("One and only one row should have been affected")
 	} else {
 		return true
 	}
 }
 
 // function used to assign player as new current_player_making_move, dealer, or highest_bidder in either poker tables or tables.
-func AssignThisPlayerToRole(tx *sql.Tx, tableName, tableId, username, setOperation string) {
+func AssignThisPlayerToRole(DB *mysql_db.DB, tableName, tableId, username, setOperation string) {
+
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
 	query := fmt.Sprintf(`UPDATE %s
 						  SET %s
 						  WHERE table_id = %s;`, tableName, setOperation, tableID)
 
-	res, err := tx.Exec(query)
+	res, err := db.Exec(query)
 
 	utils.CheckError(err)
 
@@ -135,4 +141,29 @@ func NextAvailablePlayer(DB *mysql_db.DB, playersTableName, tableID, username, s
 	}
 
 	return playerName
+}
+
+// Function clears users money in pot if they matched the highest bidder (highestBidder may have checked)
+func ClearUsersMoneyInPot(DB *mysql_db.DB, playersTableName, pokerTablesTableName, tableID string ) {
+	_, highestBid := gameinfo.GetHighestBidder(Db, pokerTablesTableName, tableID)
+
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	query := fmt.Sprintf(`UPDATE %s
+	                      SET money_in_pot = 0
+						  WHERE table_id = %s AND money_in_pot = %v;`, playersTableName, tableID, highestBid)
+
+	_, err = := db.Exec(query)
+	
+	utils.CheckError(err)
+
+	query = fmt.Springf(`UPDATE %s
+	                     SET highest_bid = 0
+						 WHERE table_id = %s`, pokerTablesTableName, tableID)
+
+	_, err = db.Exec(query)
+
+	utils.CheckError(err)
+
 }

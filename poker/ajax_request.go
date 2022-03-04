@@ -32,7 +32,7 @@ func HandleContentAjaxRequest(w http.ResponseWriter, r *http.Request) {
 	gameflow.UpdateUsersTimeSinceRequest(DB, tablesTableName, playersTableName, pokerTablesTableName, username, tableID, seatNumber)
 	
 	// retrieves the information about players and about which player is currently making a move.
-	gameDetails := gamecontent.JSONGameDetails(DB, playersTableName, tablesTableName, pokerTablesTableName, tableID )
+	gameDetails := gamecontent.JSONGameDetails(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username )
 
 	w.Write(gameDetails)
 }

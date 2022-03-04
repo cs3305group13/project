@@ -36,9 +36,7 @@ func TryReadyUpPlayer(w http.ResponseWriter, r *http.Request, DB *mysql_db.DB, t
 		begin := readyUpPlayer(w, DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
 		err := tx.Commit()
 		if begin {
-			tx = mysql_db.NewTransaction(db)
-			beginGame(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
-			tx.Commit()
+			beginGame(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 		}
 		utils.CheckError(err)
 		
@@ -107,7 +105,8 @@ func startGame(tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableNa
 	utils.CheckError(err)
 
 	query = fmt.Sprintf(`UPDATE %s
-	                     SET player_state = "PLAYING"
+	                     SET player_state = "PLAYING",
+						 	 money_in_pot = "0.0"
 						 WHERE player_state = "READY" AND table_id = %s;`, playersTableName, tableID)
 
 	_, err = tx.Exec(query)
@@ -115,36 +114,41 @@ func startGame(tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableNa
 
 	return true
 }
-func beginGame(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
+func beginGame(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
 	currentPlayerMakingMove, seatNumber := gameinfo.GetCurrentPlayerMakingMove(DB, tablesTableName, playersTableName, tableID)
 	
 	smallBlind, bigBlind, newCurrentPlayerMakingMove := findWhoShouldBeSmallAndBigBlind(DB, playersTableName, tableID, currentPlayerMakingMove, seatNumber)
 
 	smallBlindAmount := "1.0"
 	bigBlindAmount := "2.0"
-	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, tx, playersTableName, tableID, smallBlind, smallBlindAmount)
-	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, tx, playersTableName, tableID, bigBlind, bigBlindAmount)
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, tableID, smallBlind, smallBlindAmount)
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, tableID, bigBlind, bigBlindAmount)
 
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
 
 	// initialize the big blind as the highest bidder
 	query := fmt.Sprintf(`UPDATE %s
-						  SET highest_bidder = "%s"
+						  SET community_cards = " ",
+							  highest_bidder = "%s",
+						  	  highest_bid = "%s",
+							  money_in_pot = 0.0
 						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, tableID)
 
-	_, err := tx.Exec(query)  // result is ignored because TryTakeMoneyFromPlayers updates highestBidder
+	_, err := db.Exec(query)  // result is ignored because TryTakeMoneyFromPlayers updates highestBidder
+	utils.CheckError(err)
 
 	// set the current player as the player after the big blind
     query = fmt.Sprintf(`UPDATE %s
 	                     SET current_player_making_move = "%s"
 						 WHERE table_id = %s;`, tablesTableName, newCurrentPlayerMakingMove, tableID)
 
-	res, err := tx.Exec(query)
+	res, err := db.Exec(query)
 	utils.CheckError(err)
 	if utils.GetNumberOfRowsAffected(res) != 1 {
 		panic("Exactly one row should have been affected here.")
 	}
+	gamecards.GivePlayersTheirCards(DB, tablesTableName, tableID)
 }
 
 
