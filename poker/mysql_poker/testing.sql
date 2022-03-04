@@ -30,6 +30,7 @@ CREATE TABLE cs2208_jr30.dummy_poker_tables (
     highest_bidder VARCHAR(255),
     highest_bid DECIMAL(15,2),
     dealer VARCHAR(255),
+    money_in_pot DECIMAL(15,2),
     PRIMARY KEY (table_id)
 );
 
@@ -72,7 +73,7 @@ VALUES (1, DATE_SUB(NOW(), INTERVAL 48 HOUR), "barry", "AH2H3H4H5H6H7H8H9H10HJHQ
 
 DELETE FROM cs2208_jr30.dummy_poker_tables;
 INSERT INTO cs2208_jr30.dummy_poker_tables
-VALUES (1, "", "john", 1.0, "derek");
+VALUES (1, "", "john", 1.0, "derek", 1.0);
 
 
 

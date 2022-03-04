@@ -3,9 +3,9 @@
 --- PRODUCTION BELOW ------
 ---------------------------
 
-DROP TABLE tables;
+DROP TABLE cs2208_jr30.tables;
 
-CREATE TABLE tables (
+CREATE TABLE cs2208_jr30.tables (
     table_id INT NOT NULL AUTO_INCREMENT,
     time_since_last_move TIMESTAMP NOT NULL,
     current_player_making_move VARCHAR(255) NOT NULL,
@@ -15,21 +15,22 @@ CREATE TABLE tables (
     PRIMARY KEY (table_id)
 );
 
-DROP TABLE poker_tables;
+DROP TABLE cs2208_jr30.poker_tables;
 
-CREATE TABLE poker_tables (
+CREATE TABLE cs2208_jr30.poker_tables (
     table_id INT NOT NULL,
     community_cards VARCHAR(32),
     highest_bidder VARCHAR(255),
     highest_bid DECIMAL(15,2),
     dealer VARCHAR(255),
+    money_in_pot DECIMAL(15,2),
     PRIMARY KEY (table_id)
 );
 
 
-DROP TABLE players;
+DROP TABLE cs2208_jr30.players;
 
-CREATE TABLE players (
+CREATE TABLE cs2208_jr30.players (
     username VARCHAR(255),
     funds DECIMAL(15, 2),
     table_id INT,
@@ -45,10 +46,10 @@ CREATE TABLE players (
 --- END OF PRODUCTION -----
 -----------------------------------------------------------------------
 SELECT *
-FROM user_credentials;
+FROM cs2208_jr30.user_credentials;
 
 SELECT *
-FROM tables;
+FROM cs2208_jr30.tables;
 
 SELECT *
 FROM cs2208_jr30.players;
