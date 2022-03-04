@@ -16,15 +16,7 @@ func ShowDown(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, po
 	
 	players := GetPlayersAndCards(DB, playersTableName, tableID)
 	
-	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
-
-	// translate community cards to match chehsunliu implementation
-	var pokerCommunityCards []poker.Card
-	for i:=0; i<len(*communityCards); i++ {
-
-		communityCard := (*communityCards)[i]
-		pokerCommunityCards = append( pokerCommunityCards, poker.NewCard( communityCard ))
-	}
+	pokerCommunityCards := getEndOfGameCommunityCards(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
     
 	
 	for i:=0; i<len(players); i++ {
@@ -40,8 +32,6 @@ func ShowDown(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, po
 
 		playerCardsAndCommunityCards := append(pokerCommunityCards, playersCards[0], playersCards[1])
 
-		fmt.Println(playerCardsAndCommunityCards)
-
 		cardsScore := poker.Evaluate( playerCardsAndCommunityCards )
 
 		players[i].score = int(cardsScore)
@@ -56,11 +46,9 @@ func ShowDown(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, po
 			winner = players[i].username
 		}
 
-
-		fmt.Println( poker.RankString(int32(players[i].score)) )
 	}
 
-	setWinner(DB, tx, playersTableName, pokerTablesTableName, tableID, winner)
+	SetWinner(DB, tx, playersTableName, pokerTablesTableName, tableID, winner)
 }
 
 type player struct {
@@ -93,8 +81,23 @@ func GetPlayersAndCards(DB *mysql_db.DB, playersTableName, tableID string) (play
 	return players
 }
 
+func getEndOfGameCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) []poker.Card {
+	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
 
-func setWinner(DB *mysql_db.DB, tx *sql.Tx, playersTableName, pokerTablesTableName, tableID, username string) {
+
+	// translate community cards to match chehsunliu implementation
+	var pokerCommunityCards []poker.Card
+	for i:=0; i<len(*communityCards); i++ {
+
+		communityCard := (*communityCards)[i]
+		pokerCommunityCards = append( pokerCommunityCards, poker.NewCard( communityCard ))
+	}
+
+	return pokerCommunityCards
+}
+
+
+func SetWinner(DB *mysql_db.DB, tx *sql.Tx, playersTableName, pokerTablesTableName, tableID, username string) {
 	
 	query := fmt.Sprintf(`UPDATE %s
 	                      SET player_state = "WINNER"

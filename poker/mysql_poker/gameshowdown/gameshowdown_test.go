@@ -26,3 +26,16 @@ func TestGameShowDown(t *testing.T) {
 
 	ShowDown(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTableName, tableID)
 }
+
+
+func TestGetEndOfGameCommunityCards(t *testing.T) {
+	tableID := "1"
+
+
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	getEndOfGameCommunityCards(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTableName, tableID)
+}
