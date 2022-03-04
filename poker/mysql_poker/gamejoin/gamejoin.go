@@ -23,7 +23,6 @@ func CheckTableExists( tx *sql.Tx, tablesTableName, tableCode string ) bool {
 	return true
 }
 
-
 func UpdatePlayersSelectedGame(DB *mysql_db.DB, tx *sql.Tx, playersTableName, tableID, username, seatNumber string) (funds string) {
 	userFunds := gameinfo.GetPlayersFunds(DB, playersTableName, username)
 
@@ -44,4 +43,22 @@ func UpdatePlayersSelectedGame(DB *mysql_db.DB, tx *sql.Tx, playersTableName, ta
 	}
 	
 	return userFundsString
+}
+
+
+// Used for add ing player to players table when signing up
+func AddPlayer(tx *sql.Tx, playersTableName, username, funds string) bool {
+
+	columnNames := `username, funds, table_id, seat_number, player_state, player_cards, money_in_pot, time_since_request`
+
+	tableID := "0"
+	seatNumber := "0"
+	playerState := "LEFT"
+	playerCards := ""
+	moneyInPot := "0.0"
+	values := fmt.Sprintf(`"%s", "%s", "%s" , "%s", "%s", "%s", "%s", CURRENT_TIMESTAMP`, username, funds, tableID, seatNumber, playerState, playerCards, moneyInPot)
+
+	_, inserted := insert.InsertTableEntry(tx, playersTableName, columnNames, values)
+
+	return inserted
 }
