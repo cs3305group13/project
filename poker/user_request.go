@@ -13,6 +13,7 @@ import (
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameflow"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinteraction"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameshowdown"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gamestart"
 )
 
@@ -88,6 +89,18 @@ func FoldPlayer(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesT
 
 	setOperation := "current_player_making_move = "
 	successful := gameflow.SetNextAvailablePlayerAfterThisOne(DB, tx, tablesTableName, playersTableName, tableID, username, seatNumber, setOperation)
+
+	if ! successful {
+		// another non-all in player still playing couldn't be found.
+		gameEndedEarly := true
+		gamecards.AddToCommunityCards(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, gameEndedEarly)
+
+
+		err := tx.Commit()
+		utils.CheckError(err)
+		
+		tx = mysql_db.NewTransaction(db)
+	}
 	
 	gameinteraction.PlayerFolded(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, successful)
 
@@ -117,8 +130,17 @@ func EndRound(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTab
 	defer tx.Rollback()
 	defer db.Close()
 
-	gamecards.AddToCommunityCards(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
-	gameflow.ClearUsersMoneyInPot(DB, tx, playersTableName, pokerTablesTableName, tableID)
+	gameEndedEarly := false
+
+	successfullyAdded := gamecards.AddToCommunityCards(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, gameEndedEarly)
+	if ! successfullyAdded {
+		// if a card wasn't added then that means there are already 5 cards present.
+		gameshowdown.ShowDown(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+
+	} else {
+		// after each round clear every players money_in_pot field who managed to match the highestBid for this round
+	    gameflow.ClearUsersMoneyInPot(DB, tx, playersTableName, pokerTablesTableName, tableID)
+	}
 
 	err := tx.Commit()
 	utils.CheckError(err)
