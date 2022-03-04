@@ -10,11 +10,7 @@ import (
 )
 
 // function refreshes users time_since_request and checks/removes any players are idle
-func UpdateUsersTimeSinceRequest(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, username, tableID, seatNumber string) {
-	db := mysql_db.EstablishConnection(DB)
-	tx := mysql_db.NewTransaction(db)
-	defer tx.Rollback()
-	defer db.Close()
+func UpdateUsersTimeSinceRequest(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, username, tableID, seatNumber string) {
 
 	query := fmt.Sprintf(`UPDATE %s
 	                      SET time_since_request = CURRENT_TIMESTAMP()
@@ -27,8 +23,7 @@ func UpdateUsersTimeSinceRequest(DB *mysql_db.DB, tablesTableName, playersTableN
 		fmt.Println(numberOfRowsAffected)
 		panic("Exactly one row should have been affected.")
 	}
-
-	tx.Commit()
+	
 }
 
 // Method used to update next player who holds the responsibility.
@@ -47,10 +42,11 @@ func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tx *sql.Tx, tableName, 
 	utils.CheckError(err)
 
 	numOfRowsAffected := utils.GetNumberOfRowsAffected(res)
+
 	if numOfRowsAffected == 0 {
+		// if here player was reassigned his role therefore no change was encountered.
 		return false
-	}else if utils.GetNumberOfRowsAffected(res) != 1 {
-		panic("One and only one row should have been affected")
+		
 	} else {
 	    return true
 	}

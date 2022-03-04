@@ -18,6 +18,19 @@ var testingTablesTableName = envs["TESTING_TABLES_TABLE"]
 var testingPlayersTableName = envs["TESTING_PLAYERS_TABLE"]
 var testingPokerTableName = envs["TESTING_POKER_TABLES_TABLE"]
 
+
+func TestClearUsersMoneyInPot(t *testing.T) {
+
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	tableID := "1"
+	
+	ClearUsersMoneyInPot(DB, tx, testingPlayersTableName, testingPokerTableName, tableID)
+}
+
 func TestNextAvailablePlayer(t *testing.T) {
 
 	mysql_poker.RefreshPlayers(DB, testingPlayersTableName)
@@ -66,4 +79,18 @@ func TestSetNextAvailablePlayerAfterThisOne(t *testing.T) {
 	tableID := "1"
 	
 	SetNextAvailablePlayerAfterThisOne(DB, tx, testingPokerTableName, testingPlayersTableName, tableID, "derek", "1", "dealer = ")
+}
+
+func TestUpdateUsersTimeSinceRequest(t *testing.T) {
+
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	username := "derek"
+	tableID := "1"
+	seatNumber := "1"
+	
+	UpdateUsersTimeSinceRequest(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTableName, username, tableID, seatNumber)
 }
