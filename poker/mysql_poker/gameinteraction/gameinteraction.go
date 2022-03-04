@@ -37,6 +37,9 @@ func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, poker
 	                     SET money_in_pot = money_in_pot + %v
 						 WHERE table_id = %s;`, pokerTablesTableName, bid, tableID)
 
+	_, err = tx.Exec(query)
+	utils.CheckError(err)
+
 	taken = true
 	return taken
 }
