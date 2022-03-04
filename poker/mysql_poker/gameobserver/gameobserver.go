@@ -18,7 +18,7 @@ func GameObserver(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTable
 
 	numOfPlayers := gameinfo.GetNumberOfPlayersAtTable( DB, playersTableName, tableID )  // check how many players are in game.
 	db := mysql_db.EstablishConnection(DB)
-	var tx *sql.Tx
+	tx := mysql_db.NewTransaction(db)
 	defer tx.Rollback()
 	defer db.Close()
 	
@@ -33,7 +33,7 @@ func GameObserver(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTable
 
 		numOfPlayers = gameinfo.GetNumberOfPlayersAtTable( DB, playersTableName, tableID )  // refresh numOfPlayers
 		
-		time.Sleep(time.Second)
+		time.Sleep( time.Second )
 	}
 }
 
