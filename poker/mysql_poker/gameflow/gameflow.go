@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
 	"github.com/cs3305/group13_2022/project/utils"
 )
 
@@ -135,4 +136,25 @@ func NextAvailablePlayer(DB *mysql_db.DB, playersTableName, tableID, username, s
 	}
 
 	return playerName
+}
+
+// function clears users money in pot if they matched the highest bidder(highestBidder may have checked.)
+func ClearUsersMoneyInPot(DB *mysql_db.DB, tx *sql.Tx, playersTableName, pokerTablesTableName, tableID string) {
+	_, highestBid := gameinfo.GetHighestBidder(DB, pokerTablesTableName, tableID)
+
+	query := fmt.Sprintf(`UPDATE %s
+	                      SET money_in_pot = 0
+						  WHERE table_id = %s AND money_in_pot = %v;`, playersTableName, tableID, highestBid)
+
+	_, err := tx.Exec(query)
+
+	utils.CheckError(err)
+
+    query = fmt.Sprintf(`UPDATE %s
+	                     SET highest_bid = 0
+						 WHERE table_id = %s`, pokerTablesTableName, tableID)
+
+	_, err = tx.Exec(query)
+
+	utils.CheckError(err)
 }
