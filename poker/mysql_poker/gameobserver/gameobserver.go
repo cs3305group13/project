@@ -34,7 +34,6 @@ func GameObserver(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTable
 		numOfPlayers = gameinfo.GetNumberOfPlayersAtTable( DB, playersTableName, tableID )  // refresh numOfPlayers
 		
 		time.Sleep(time.Second)
-		fmt.Println("slept one second")
 	}
 }
 

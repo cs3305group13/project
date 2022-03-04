@@ -96,7 +96,6 @@ func refreshExpirationTime( w http.ResponseWriter, r *http.Request, tokenName st
 		return
 	}
 	newExpirationTime := (time.Now().Add(time.Duration(TIME_UNTIL_EXPIRY) * time.Minute))
-	fmt.Println("Time to live of refresh --> ", newExpirationTime)
 
 	// Updates both just to reduce bugs later.
 	claims.ExpiresAt = newExpirationTime.Unix()
