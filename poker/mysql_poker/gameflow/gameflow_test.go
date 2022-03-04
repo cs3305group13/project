@@ -33,7 +33,7 @@ func TestClearUsersMoneyInPot(t *testing.T) {
 
 func TestNextAvailablePlayer(t *testing.T) {
 
-	mysql_poker.RefreshPlayers(DB, testingPlayersTableName)
+	mysql_poker.RefreshPlayerTable( DB )
 
 	tableID := "1"
 	
@@ -43,7 +43,7 @@ func TestNextAvailablePlayer(t *testing.T) {
 
 func TestNextAvailablePlayers(t *testing.T) {
 
-	mysql_poker.RefreshPlayers(DB, testingPlayersTableName)
+	mysql_poker.RefreshPlayerTable( DB )
 
 	tableID := "1"
 	playerNames := NextAvailablePlayers(DB, testingPlayersTableName, tableID, "derek", "1")
@@ -69,7 +69,7 @@ func TestAssignThisPlayerToRole(t *testing.T) {
 }
 
 func TestSetNextAvailablePlayerAfterThisOne(t *testing.T) {
-	mysql_poker.RefreshPlayers(DB, testingPlayersTableName)
+	mysql_poker.RefreshPlayerTable( DB )
 
 	db := mysql_db.EstablishConnection(DB)
 	tx := mysql_db.NewTransaction(db)

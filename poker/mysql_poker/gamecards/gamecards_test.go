@@ -67,7 +67,7 @@ func TestAssignPlayerHisCards(t *testing.T) {
 
 func TestGivePlayersTheirCards(t *testing.T) {
 	
-	mysql_poker.RefreshPlayers(DB, testingPlayersTableName)
+	mysql_poker.RefreshPlayerTable( DB )
 
 	db := mysql_db.EstablishConnection(DB)
 	tx := mysql_db.NewTransaction(db)
