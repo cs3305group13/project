@@ -62,11 +62,12 @@ func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName
 	// ^ contains number of players still in game (this player who wants to fold, players still playing, and all in players)
 
 	if ! nextPlayerFoundBool && numberOfPlayersStillPlaying == 1{
-		// no one is all in and this is last player not folded so cannot let them fold
-		// give player pot
+		gameshowdown.SetWinner(DB, tx, playersTableName, pokerTablesTableName, tableID, username)
 		return
+
 	} else if ! nextPlayerFoundBool && numberOfPlayersStillPlaying > 1{
 		gameshowdown.ShowDown(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+
 	}else {
 		// if here then there are still other players playing therefore this player can fold
 

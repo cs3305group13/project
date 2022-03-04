@@ -104,6 +104,21 @@ func TestPlayerFolded(t *testing.T) {
 	PlayerFolded(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTableName, tableID, username, seatNumber, nextPlayerFoundBool)
 }
 
+func TestPlayerFoldedButIsLastPlayer(t *testing.T) {
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	tableID := "1"
+	username := "barry"
+	seatNumber := "4"
+
+	nextPlayerFoundBool := false
+	
+	PlayerFolded(DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTableName, tableID, username, seatNumber, nextPlayerFoundBool)
+}
+
 // ++++++++++ PlayerTakesAction() testing ++++++++++
 func TestPlayerTakesCallAction(t *testing.T) {
 
