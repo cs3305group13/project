@@ -100,6 +100,17 @@ func PlayerTakesAction(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTabl
 	setOperation := "current_player_making_move = "
 	successful := gameflow.SetNextAvailablePlayerAfterThisOne(DB, tx, tablesTableName, playersTableName, tableID, username, seatNumber, setOperation)
 
+	numberOfPlayersStillPlaying := gameinfo.GetNumberOfPlayersStillPlaying(DB, playersTableName, tableID, username, seatNumber)
+	// ^ contains number of players still in game (this player who wants to fold, players still playing, and all in players)
+
+	if ! successful && numberOfPlayersStillPlaying == 1{
+		gameshowdown.SetWinner(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
+		return
+
+	} else if ! successful && numberOfPlayersStillPlaying > 1{
+		gameshowdown.ShowDown(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+
+	}
 
 	if amountAsFloat64 >= playersFunds {
 		playerAllIn(tx, playersTableName, username)
