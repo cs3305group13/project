@@ -1,145 +1,123 @@
-window.addEventListener('DOMContentLoaded', init, false);
+package gamecontent
 
-// Returns a Promise that resolves after "ms" Milliseconds
-const timer = ms => new Promise(res => setTimeout(res, ms));
+import (
+	"encoding/json"
+	"fmt"
+	"strconv"
 
-let contentURL;
-let gameContentRequest;
+	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/utils"
+)
 
-let MAX_NUMBER_OF_PLAYERS = 8;
-
-function init() {
-    contentURL = 'content_request';
-    gameContentRequest = new XMLHttpRequest();
-    gameContentRequest.addEventListener('readystatechange', handleContentResponse, false);
-    sendRequests();
+type gameDetails struct {
+	Players *[]player
+	TableDetails *tableDetails
 }
 
-async function sendRequests() {
-    while ( true ) {
-        gameContentRequest.open('GET', contentURL, true);
-        gameContentRequest.send(null);
-        await timer(2000); // then the created Promise can be awaited
-    }
-}
+func JSONGameDetails(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username string) []byte {
 
-function handleContentResponse() {
-    if (this.readyState == 4 && this.status == 200) {
-        let gameContent = gameContentRequest.responseText;
-        insertGameContent(gameContent);
-    }
+	tableDetails := getTableDetails(DB, tablesTableName, pokerTablesTableName, tableID)
+
+	players := getPlayerDetails(DB, playersTableName, tableID, username)
+	
+	details := gameDetails{players, tableDetails}
+
+	d, _ := json.MarshalIndent(details, "", " ")
+
+	return d
 }
 
 
-function insertGameContent( gameContent ) {
-    var content = JSON.parse(gameContent);
-
-    insertPlayersIntoHTML(content.Players);
-    insertDetailsIntoHTML(content.TableDetails);
+type player struct {
+	Username string
+	Funds string
+	SeatNumber string
+	PlayerState string
+	MoneyInPot string
+	Cards string
 }
 
+func getPlayerDetails( DB *mysql_db.DB, playerTableName, tableID, username string ) *[]player {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
 
-let usernameTAG;
-let fundsTAG;
-let stateTAG;
-let moneyInPotTAG;
-let cardsTAG;
+	var query = fmt.Sprintf(`SELECT username, funds, seat_number, player_state, money_in_pot
+	                                FROM %s 
+	                                WHERE table_id = %s
+									ORDER BY seat_number ASC;`, playerTableName, tableID)
 
-let username;
-let funds;
-// let seatNumber;
-let playerState;
-let moneyInPot;
-let cards;
+	rows, err := db.Query(query)
+	utils.CheckError(err)
 
-function insertPlayersIntoHTML( players ) {
-    for (let i=1; i<=players.length; i++) {
-        seatTAG = document.querySelector("#seat_" + i);
+	defer rows.Close()
 
-        usernameTAG = document.querySelector("#username_" + i);
-        fundsTAG = document.querySelector("#funds_" + i);
-        stateTAG = document.querySelector("#state_" + i);
-        moneyInPotTAG = document.querySelector("#money_in_pot_" + i);
-        cardsTAG = document.querySelector("#cards_" + i);
+	var players []player
 
-        username = players[i-1].Username;
-        funds = players[i-1].Funds;
-        // seatNumber = players[i-1].SeatNumber;
-        playerState = players[i-1].PlayerState;
-        moneyInPot = players[i-1].MoneyInPot;
-        cards = players[i-1].Cards;
+	MAX_NUMBER_OF_PLAYERS := 8
+	for i:=1; i<=MAX_NUMBER_OF_PLAYERS; i++ {
+		players = append(players, player{})
+	}
 
-        currentPlayerMakingMoveTAG = document.querySelector("#current_player_making_move");
+    for rows.Next() {
+		p := player{}
+		err := rows.Scan(&p.Username, &p.Funds, &p.SeatNumber, &p.PlayerState, &p.MoneyInPot)
+		utils.CheckError(err)
 
-        if ( detectRefresh() ) {
-            continue;
-        }
+		thisPlayersSeatNumber, err := strconv.Atoi(p.SeatNumber)
+		utils.CheckError(err)
 
-        usernameTAG.innerHTML = username;
-        fundsTAG.innerHTML = funds;
-        stateTAG.innerHTML = playerState;
-        moneyInPotTAG.innerHTML = moneyInPot;
-        cardsTAG.innerHTML = cards;
-    }
+		if p.Username == username {
+			p.Cards = getThisUsersCards(DB, playerTableName, username)
+		}
+
+		players[ thisPlayersSeatNumber - 1 ] = p
+	}
+
+	return &players
 }
 
-// function checks if player list html should refresh
-function detectRefresh() {
-    if ( usernameTAG.innerHTML !== username ) {
-        return false;
-    }
-    if ( fundsTAG.innerHTML !== funds ) {
-        return false;
-    }
-    if ( stateTAG.innerHTML !== playerState ) {
-        return false;
-    }
-    if ( moneyInPotTAG.innerHTML !== moneyInPot ) {
-        return false;
-    }
-    if ( cardsTAG.innerHTML !== cards ) {
-        return false;
-    }
-    
-    return true;
+func getThisUsersCards(DB *mysql_db.DB, playerTableName, username string) (playerCards string) {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+	
+	query :=fmt.Sprintf(`SELECT player_cards
+	                     FROM %s
+						 WHERE username = "%s";`, playerTableName, username)
+
+	err := db.QueryRow(query).Scan(&playerCards)
+	utils.CheckError(err)
+
+
+	return playerCards
 }
 
-function insertDetailsIntoHTML( tableDetails ) {
-    communityCardsTAG = document.querySelector("#community_cards");
-    currentPlayerMakingMoveTAG = document.querySelector("#current_player_making_move");
-    moneyInPotTAG = document.querySelector("#money_in_pot")
+type tableDetails struct {
+	CurrentPlayerMakingMove string
+	GameState string
+	CommunityCards string
+	MoneyInPot string
+}
 
-    communityCards = tableDetails.CommunityCards;
-    currentPlayerMakingMove = tableDetails.CurrentPlayerMakingMove;
-    moneyInPot = tableDetails.MoneyInPot;
+func getTableDetails( DB *mysql_db.DB, tablesTableName, pokerTablesTableName, tableID string ) *tableDetails {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+	
+	var query = fmt.Sprintf(string(`SELECT current_player_making_move, game_in_progress
+	                                FROM %s 
+				                    WHERE table_id = %s;`), tablesTableName, tableID)
+	
+	tableDetails := tableDetails{}
+	err := db.QueryRow(query).Scan(&tableDetails.CurrentPlayerMakingMove,
+	                               &tableDetails.GameState)
+	utils.CheckError(err)
 
-    communityCardsTAG.innerHTML = communityCards;
-    currentPlayerMakingMoveTAG.innerHTML = currentPlayerMakingMove;
-    moneyInPotTAG.innerHTML = moneyInPot;
+	query = fmt.Sprintf(`SELECT community_cards, money_in_pot
+	                     FROM %s
+						 WHERE table_id = %s`, pokerTablesTableName, tableID)
 
-    hiddenUsernameTAG = document.querySelector("#hidden_username_tag");
-    hiddenSeatNumberTAG = document.querySelector("#hidden_seatnumber_tag");
+	err = db.QueryRow(query).Scan(&tableDetails.CommunityCards, &tableDetails.MoneyInPot)
+	
+	utils.CheckError(err)
 
-    SeatTAG = document.querySelector("#seat_" + hiddenSeatNumberTAG.innerHTML);
-
-
-    let gameButtonsFormTAG = document.querySelector("#game_buttons_form");
-    if ( hiddenUsernameTAG.innerHTML === currentPlayerMakingMoveTAG.innerHTML ) {
-        SeatTAG.style.backgroundColor = "cadetblue";
-        gameButtonsFormTAG.style.display = "block";
-        
-    } else {
-        SeatTAG.style.backgroundColor = "blue";
-        gameButtonsFormTAG.style.display = "none";
-    }
-
-    
-    gameState = tableDetails.GameState;
-    let readyButtonFormTAG = document.querySelector("#player_state_button_form");
-    if (gameState == "1" ) { // aka. game is in progress
-        readyButtonFormTAG.style.display = "none";
-
-    } else {
-        readyButtonFormTAG.style.display = "block";
-    }
+    return &tableDetails
 }
