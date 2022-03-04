@@ -117,8 +117,7 @@ func EndRound(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTab
 	defer tx.Rollback()
 	defer db.Close()
 
-	gamecards.AddToCommunityCards(DB, tx, tablesTableName, pokerTablesTableName, tableID)
-	// TODO: 
+	gamecards.AddToCommunityCards(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 	gameflow.ClearUsersMoneyInPot(DB, tx, playersTableName, pokerTablesTableName, tableID)
 
 	err := tx.Commit()
