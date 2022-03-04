@@ -9,6 +9,24 @@ import (
 	"github.com/cs3305/group13_2022/project/utils"
 )
 
+func GameInProgress( DB *mysql_db.DB, tablesTableName, tableID string ) bool {
+	
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	query := fmt.Sprintf(`SELECT game_in_progress
+	                      FROM %s
+						  WHERE table_id = "%s";`, tablesTableName, tableID)
+
+	var gameState bool
+	err := db.QueryRow(query).Scan(&gameState)
+
+	utils.CheckError(err)
+
+	return gameState
+}
+
+
 func GetCurrentPlayerMakingMove(DB *mysql_db.DB, tablesTableName, playersTableName, tableID string) (currentPlayerMakingMove, seatNumber string) {
 
 	db := mysql_db.EstablishConnection(DB)
@@ -188,4 +206,18 @@ func GetPlayersFunds(DB *mysql_db.DB, playersTableName, username string) (funds 
 	utils.CheckError(err)
 
 	return funds
+}
+
+func GetPlayersMoneyInPot(DB *mysql_db.DB, playersTableName, username string) (moneyInPot float64) {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+	
+	query := fmt.Sprintf(`SELECT money_in_pot
+	                      FROM %s
+						  WHERE username = "%s"`, playersTableName, username)
+
+	err := db.QueryRow(query).Scan(&moneyInPot)
+	utils.CheckError(err)
+
+	return moneyInPot
 }
