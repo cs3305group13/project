@@ -58,17 +58,23 @@ func PlayersTurn(DB *mysql_db.DB, tablesTableName, playersTableName, tableID, us
 
 func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber string, nextPlayerFoundBool bool) {
 	
+	numberOfPlayersAllIn := gameinfo.GetNumberOfPlayersAllIn(DB, playersTableName, tableID)
+
 	numberOfPlayersStillPlaying := gameinfo.GetNumberOfPlayersStillPlaying(DB, playersTableName, tableID, username, seatNumber)
 	// ^ contains number of players still in game (this player who wants to fold, players still playing, and all in players)
-
+	
+	if numberOfPlayersAllIn == 0 && numberOfPlayersStillPlaying == 2 {
+		nextAvailablePlayer := gameflow.NextAvailablePlayer(DB, playersTableName, tableID, username, seatNumber)
+		gameshowdown.SetWinner(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, nextAvailablePlayer)
+	}
 	if ! nextPlayerFoundBool && numberOfPlayersStillPlaying == 1{
-		gameshowdown.SetWinner(DB, tx, playersTableName, pokerTablesTableName, tableID, username)
+		gameshowdown.SetWinner(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
 		return
 
 	} else if ! nextPlayerFoundBool && numberOfPlayersStillPlaying > 1{
 		gameshowdown.ShowDown(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 
-	}else {
+	} else {
 		// if here then there are still other players playing therefore this player can fold
 
 		query := fmt.Sprintf(`
@@ -84,7 +90,7 @@ func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName
 		if numberOfRows != 1 {
 			panic("One and only one row should have been changed with this operation.")
 		}
-	} 
+	}
 }
 
 func PlayerTakesAction(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, amount string) (action string) {
