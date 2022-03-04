@@ -160,7 +160,7 @@ func findWhoShouldBeSmallAndBigBlind(DB *mysql_db.DB, playersTableName, tableID,
 	if len(playerNames) == 2 {
 	    newCurrentPlayer = playerNames[0]
 	} else {
-		newCurrentPlayer = playerNames[1]
+		newCurrentPlayer = playerNames[2]
 	}
 
 	return small, big, newCurrentPlayer
