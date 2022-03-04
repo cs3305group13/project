@@ -19,7 +19,7 @@ func TestJSONGameDetails(t *testing.T) {
 	tableID := "1"
 	username := "derek"
 
-	details := JSONGameDetails(DB, playersTableName, tablesTableName, pokerTablesTableName, tableID, username)
+	details := JSONGameDetails(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
 
 	fmt.Println(string(details))
 }
