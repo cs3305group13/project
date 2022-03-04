@@ -144,7 +144,7 @@ func beginGame(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, p
 
 	res, err := tx.Exec(query)
 	utils.CheckError(err)
-	if utils.GetNumberOfRowsAffected(res) != 1 {
+	if utils.GetNumberOfRowsAffected(res) > 1 {
 		panic("Exactly one row should have been affected here.")
 	}
 
