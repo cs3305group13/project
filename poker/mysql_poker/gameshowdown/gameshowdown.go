@@ -6,6 +6,7 @@ import (
 
 	"github.com/cs3305/group13_2022/project/cards"
 	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameflow"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
 	"github.com/cs3305/group13_2022/project/utils"
 
@@ -48,7 +49,7 @@ func ShowDown(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, po
 
 	}
 
-	SetWinner(DB, tx, playersTableName, pokerTablesTableName, tableID, winner)
+	SetWinner(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, winner)
 }
 
 type player struct {
@@ -119,4 +120,28 @@ func SetWinner(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, p
 	    utils.CheckError(err)
 	}
 
+	resetGameState(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+}
+
+
+
+// method called if game state is to be reset .ie game ended
+func resetGameState(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
+
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	_, _, dealer, dealerSeatNumber := gameinfo.GetDealerAndHighestBidder(DB, playersTableName, pokerTablesTableName, tableID)
+
+	setOperation := "current_player_making_move = "
+	gameflow.SetNextAvailablePlayerAfterThisOne(DB, tx, tablesTableName, playersTableName, tableID, dealer, dealerSeatNumber, setOperation)
+
+	query := fmt.Sprintf(`UPDATE %s
+	                      SET game_in_progress = false
+						  WHERE table_id = %s`, tablesTableName, tableID)
+
+
+	_, err := db.Exec(query)
+
+	utils.CheckError(err)
 }
