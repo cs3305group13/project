@@ -30,6 +30,7 @@ CREATE TABLE cs2208_jr30.dummy_poker_tables (
     highest_bidder VARCHAR(255),
     highest_bid DECIMAL(15,2),
     dealer VARCHAR(255),
+    money_in_pot DECIMAL(15,2),
     PRIMARY KEY (table_id)
 );
 
@@ -54,25 +55,25 @@ DELETE FROM cs2208_jr30.dummy_players;
 
 INSERT INTO cs2208_jr30.dummy_players 
 VALUES 
-       ("derek", 30.0, 1, 1, "PLAYING", "", 0.0, CURRENT_TIMESTAMP()),
-       ("jason", 30.0, 1, 2, "PLAYING", "", 0.0, CURRENT_TIMESTAMP()),
-       ("john", 30.0, 1, 3, "PLAYING", "", 0.0, CURRENT_TIMESTAMP()),
-       ("barry", 30.0, 1, 4, "PLAYING", "", 0.0, CURRENT_TIMESTAMP()),
-       ("ahmed", 30.0, 1, 5, "PLAYING", "", 0.0, CURRENT_TIMESTAMP()),
-       ("laura", 30.0, 1, 6, "PLAYING", "", 0.0, CURRENT_TIMESTAMP()),
-       ("alejandro", 30.0, 1, 7, "PLAYING", "", 0.0, CURRENT_TIMESTAMP()),
-       ("dan", 30.0, 1, 8, "PLAYING", "", 0.0, CURRENT_TIMESTAMP());
+       ("derek", 30.0, 1, 1, "PLAYING", "2h3h", 0.0, CURRENT_TIMESTAMP()),
+       ("jason", 30.0, 1, 2, "PLAYING", "4h5h", 0.0, CURRENT_TIMESTAMP()),
+       ("john", 30.0, 1, 3, "PLAYING", "6h7h", 0.0, CURRENT_TIMESTAMP()),
+       ("barry", 30.0, 1, 4, "PLAYING", "8h9h", 0.0, CURRENT_TIMESTAMP()),
+       ("ahmed", 30.0, 1, 5, "PLAYING", "2d3d", 0.0, CURRENT_TIMESTAMP()),
+       ("laura", 30.0, 1, 6, "PLAYING", "4d5d", 0.0, CURRENT_TIMESTAMP()),
+       ("alejandro", 30.0, 1, 7, "PLAYING", "TsJs", 0.0, CURRENT_TIMESTAMP()),
+       ("dan", 30.0, 1, 8, "PLAYING", "6d7d", 0.0, CURRENT_TIMESTAMP());
 
  
 
 DELETE FROM cs2208_jr30.dummy_tables;
 INSERT INTO cs2208_jr30.dummy_tables 
-VALUES (1, DATE_SUB(NOW(), INTERVAL 48 HOUR), "barry", "AH2H3H4H5H6H7H8H9H10HJHQHKHAD2D3D4D5D6D7D8D9D10DJDQDKDAS2S3S4S5S6S7S8S9S10SJSQSKSAC2C3C4C5C6C7C8C9C10CJCQCKC", "", true);
+VALUES (1, DATE_SUB(NOW(), INTERVAL 48 HOUR), "barry", "Ah2h3h4h5h6h7h8h9hThJhQhKhAd2d3d4d5d6d7d8d9dTdJdQdKdAs2s3s4s5s6s7s8s9sTsJsQsKsAc2c3c4c5c6c7c8c9cTcJcQcKc", "", true);
 
 
 DELETE FROM cs2208_jr30.dummy_poker_tables;
 INSERT INTO cs2208_jr30.dummy_poker_tables
-VALUES (1, "", "john", 1.0, "derek");
+VALUES (1, "QsKsAs", "john", 1.0, "derek", 1.0);
 
 
 

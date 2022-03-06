@@ -13,6 +13,7 @@ import (
 
 // Function monitors if any players go idle. Should be use with goroutine call.
 //
+<<<<<<< HEAD
 // IMPORTANT - test takes 5 seconds because of condition in mysql query 
 func GameObserver(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
 
@@ -22,11 +23,23 @@ func GameObserver(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTable
 		for numOfPlayers != 0 {
 			removeIdleUsers(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 		}
+=======
+// IMPORTANT - dont test
+func GameObserver(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
+
+	numOfPlayers := gameinfo.GetNumberOfPlayersAtTable( DB, playersTableName, tableID )  // check how many players are in game.
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+	
+	for numOfPlayers != 0 {
+		tx = mysql_db.NewTransaction(db)
+>>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 		
 		numOfPlayers = gameinfo.GetNumberOfPlayersAtTable( DB, playersTableName, tableID )  // refresh numOfPlayers
 		
-		time.Sleep(time.Second)
-		fmt.Println("slept one second")
+		time.Sleep( time.Second )
 	}
 }
 

@@ -23,7 +23,7 @@ var testingPokerTablesTableName = envs["TESTING_POKER_TABLES_TABLE"]
 
 
 func TestFindWhoShouldBeSmallAndBigBlind(t *testing.T) {
-	mysql_poker.RefreshPlayers(DB, testingPlayersTableName)
+	mysql_poker.RefreshPlayerTable( DB )
 
 	tableID := "1"
 	currentPlayerMakingMove := "derek"
@@ -50,7 +50,7 @@ func TestBeginGame(t *testing.T) {
 
 	tableID := "1"
 
-	mysql_poker.RefreshPlayers(DB, testingPlayersTableName)
+	mysql_poker.RefreshPlayerTable( DB )
 
 	beginGame(DB, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID)
 }

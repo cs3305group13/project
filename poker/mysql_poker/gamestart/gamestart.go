@@ -7,6 +7,7 @@ import (
 
 	"github.com/cs3305/group13_2022/project/cards"
 	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gamecards"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameflow"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinteraction"
@@ -20,7 +21,7 @@ func TryReadyUpPlayer(w http.ResponseWriter, r *http.Request, DB *mysql_db.DB, t
 
 	tableID := token.GetTableID(r, "token")
 
-	if gameinteraction.GameInProgress(w, DB, tablesTableName, tableID) { // aka not everyone is ready
+	if gameinfo.GameInProgress(DB, tablesTableName, tableID) { // aka not everyone is ready
 		w.Write([]byte("MESSAGE:\nGame is in progress."))
 		return 
 
@@ -121,19 +122,30 @@ func beginGame(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTa
 
 	smallBlindAmount := "1.0"
 	bigBlindAmount := "2.0"
+<<<<<<< HEAD
 	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, tableID, smallBlind, smallBlindAmount)
 	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, tableID, bigBlind, bigBlindAmount)
+=======
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, tx, playersTableName, pokerTablesTableName, tableID, smallBlind, smallBlindAmount)
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, tx, playersTableName, pokerTablesTableName, tableID, bigBlind, bigBlindAmount)
+>>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
 
 	// initialize the big blind as the highest bidder
 	query := fmt.Sprintf(`UPDATE %s
+<<<<<<< HEAD
 						  SET community_cards = " ",
 							  highest_bidder = "%s",
 						  	  highest_bid = "%s",
 							  money_in_pot = 0.0
 						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, tableID)
+=======
+						  SET highest_bidder = "%s",
+						      highest_bid = "%s"
+						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, bigBlindAmount, tableID)
+>>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
 	_, err := db.Exec(query)  // result is ignored because TryTakeMoneyFromPlayers updates highestBidder
 	utils.CheckError(err)
@@ -145,10 +157,15 @@ func beginGame(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTa
 
 	res, err := db.Exec(query)
 	utils.CheckError(err)
-	if utils.GetNumberOfRowsAffected(res) != 1 {
+	if utils.GetNumberOfRowsAffected(res) > 1 {
 		panic("Exactly one row should have been affected here.")
 	}
+<<<<<<< HEAD
 	gamecards.GivePlayersTheirCards(DB, tablesTableName, tableID)
+=======
+
+	gamecards.GivePlayersTheirCards(DB, tx, tablesTableName, playersTableName, tableID)
+>>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 }
 
 
@@ -160,7 +177,7 @@ func findWhoShouldBeSmallAndBigBlind(DB *mysql_db.DB, playersTableName, tableID,
 	if len(playerNames) == 2 {
 	    newCurrentPlayer = playerNames[0]
 	} else {
-		newCurrentPlayer = playerNames[1]
+		newCurrentPlayer = playerNames[2]
 	}
 
 	return small, big, newCurrentPlayer

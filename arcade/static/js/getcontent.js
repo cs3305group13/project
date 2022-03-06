@@ -49,10 +49,12 @@ let username;
 let funds;
 // let seatNumber;
 let playerState;
+let moneyInPot;
 let cards;
 
 function insertPlayersIntoHTML( players ) {
     for (let i=1; i<=players.length; i++) {
+        seatTAG = document.querySelector("#seat_" + i);
 
         usernameTAG = document.querySelector("#username_" + i);
         fundsTAG = document.querySelector("#funds_" + i);
@@ -63,52 +65,86 @@ function insertPlayersIntoHTML( players ) {
         username = players[i-1].Username;
         funds = players[i-1].Funds;
         // seatNumber = players[i-1].SeatNumber;
-        let playerState = players[i-1].PlayerState;
-        let moneyInPot = players[i-1].MoneyInPot;
-        let cards = players[i-1].Cards;
+        playerState = players[i-1].PlayerState;
+        moneyInPot = players[i-1].MoneyInPot;
+        cards = players[i-1].Cards;
+
+        currentPlayerMakingMoveTAG = document.querySelector("#current_player_making_move");
 
         if ( detectRefresh() ) {
             continue;
         }
-        
+
         usernameTAG.innerHTML = username;
         fundsTAG.innerHTML = funds;
         stateTAG.innerHTML = playerState;
         moneyInPotTAG.innerHTML = moneyInPot;
-        cardsTAG.innerHTML = cards
+        cardsTAG.innerHTML = cards;
     }
 }
 
-// function checks if player list html should refresh 
+// function checks if player list html should refresh
 function detectRefresh() {
-    if (usernameTAG.innerHTML !== username ) {
+    if ( usernameTAG.innerHTML !== username ) {
         return false;
     }
-    if (fundsTAG.innerHTML !== funds ) {
+    if ( fundsTAG.innerHTML !== funds ) {
         return false;
     }
-    if (stateTAG.innerHTML !== playerState ) {
+    if ( stateTAG.innerHTML !== playerState ) {
         return false;
     }
-    if (moneyInPotTAG.innerHTML !== moneyInPOT ) {
+    if ( moneyInPotTAG.innerHTML !== moneyInPot ) {
         return false;
     }
-    if (cardsTAG.innerHTML !== cards ) {
+    if ( cardsTAG.innerHTML !== cards ) {
         return false;
     }
+    
     return true;
 }
 
 function insertDetailsIntoHTML( tableDetails ) {
     communityCardsTAG = document.querySelector("#community_cards");
     currentPlayerMakingMoveTAG = document.querySelector("#current_player_making_move");
-    gameStateTAG = document.querySelector("#game_state");
+    moneyInPotTAG = document.querySelector("#money_in_pot")
 
     communityCards = tableDetails.CommunityCards;
     currentPlayerMakingMove = tableDetails.CurrentPlayerMakingMove;
-    gameState = tableDetails.GameState;
+    moneyInPot = tableDetails.MoneyInPot;
 
     communityCardsTAG.innerHTML = communityCards;
     currentPlayerMakingMoveTAG.innerHTML = currentPlayerMakingMove;
-    gameState.innerHTML = gameState;
+    moneyInPotTAG.innerHTML = moneyInPot;
+
+    hiddenUsernameTAG = document.querySelector("#hidden_username_tag");
+    hiddenSeatNumberTAG = document.querySelector("#hidden_seatnumber_tag");
+
+    SeatTAG = document.querySelector("#seat_" + hiddenSeatNumberTAG.innerHTML);
+
+    gameState = tableDetails.GameState;
+
+    let gameButtonsFormTAG = document.querySelector("#game_buttons_form");
+    if ( hiddenUsernameTAG.innerHTML === currentPlayerMakingMoveTAG.innerHTML && gameState == 1 ) {
+        SeatTAG.style.backgroundColor = "cadetblue";
+        gameButtonsFormTAG.style.display = "block";
+        
+    } else {
+        SeatTAG.style.backgroundColor = "blue";
+        gameButtonsFormTAG.style.display = "none";
+    }
+
+    
+    let readyButtonFormTAG = document.querySelector("#player_state_button_form");
+    if (gameState == "1" ) { // aka. game is in progress
+        readyButtonFormTAG.style.display = "none";
+
+    } else {
+        readyButtonFormTAG.style.display = "block";
+    }
+}
+
+
+function HandleUserButtonDisplay() {
+    
 }

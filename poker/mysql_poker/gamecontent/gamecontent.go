@@ -3,7 +3,6 @@ package gamecontent
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/cs3305/group13_2022/project/mysql_db"
@@ -15,11 +14,11 @@ type gameDetails struct {
 	TableDetails *tableDetails
 }
 
-func JSONGameDetails(DB *mysql_db.DB, playersTableName, tablesTableName, pokerTablesTableName, tableID string) []byte {
-
-	players := getPlayerDetails(DB, playersTableName, tableID)
+func JSONGameDetails(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username string) []byte {
 
 	tableDetails := getTableDetails(DB, tablesTableName, pokerTablesTableName, tableID)
+
+	players := getPlayerDetails(DB, playersTableName, tableID, username)
 	
 	details := gameDetails{players, tableDetails}
 
@@ -38,20 +37,18 @@ type player struct {
 	Cards string
 }
 
-func getPlayerDetails( DB *mysql_db.DB, tableName, tableID string ) *[]player {
+func getPlayerDetails( DB *mysql_db.DB, playerTableName, tableID, username string ) *[]player {
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
 
-	var query = fmt.Sprintf(string(`SELECT username, funds, seat_number, player_state, money_in_pot, player_cards
+	var query = fmt.Sprintf(`SELECT username, funds, seat_number, player_state, money_in_pot
 	                                FROM %s 
 	                                WHERE table_id = %s
-									ORDER BY seat_number ASC;`), tableName, tableID)
+									ORDER BY seat_number ASC;`, playerTableName, tableID)
 
 	rows, err := db.Query(query)
+	utils.CheckError(err)
 
-	if err != nil {
-		log.Fatal(err)
-	}
 	defer rows.Close()
 
 	var players []player
@@ -63,11 +60,15 @@ func getPlayerDetails( DB *mysql_db.DB, tableName, tableID string ) *[]player {
 
     for rows.Next() {
 		p := player{}
-		err := rows.Scan(&p.Username, &p.Funds, &p.SeatNumber, &p.PlayerState, &p.MoneyInPot, &p.Cards)
+		err := rows.Scan(&p.Username, &p.Funds, &p.SeatNumber, &p.PlayerState, &p.MoneyInPot)
 		utils.CheckError(err)
 
 		thisPlayersSeatNumber, err := strconv.Atoi(p.SeatNumber)
 		utils.CheckError(err)
+
+		if p.Username == username {
+			p.Cards = getThisUsersCards(DB, playerTableName, username)
+		}
 
 		players[ thisPlayersSeatNumber - 1 ] = p
 	}
@@ -75,10 +76,26 @@ func getPlayerDetails( DB *mysql_db.DB, tableName, tableID string ) *[]player {
 	return &players
 }
 
+func getThisUsersCards(DB *mysql_db.DB, playerTableName, username string) (playerCards string) {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+	
+	query :=fmt.Sprintf(`SELECT player_cards
+	                     FROM %s
+						 WHERE username = "%s";`, playerTableName, username)
+
+	err := db.QueryRow(query).Scan(&playerCards)
+	utils.CheckError(err)
+
+
+	return playerCards
+}
+
 type tableDetails struct {
 	CurrentPlayerMakingMove string
 	GameState string
 	CommunityCards string
+	MoneyInPot string
 }
 
 func getTableDetails( DB *mysql_db.DB, tablesTableName, pokerTablesTableName, tableID string ) *tableDetails {
@@ -94,11 +111,11 @@ func getTableDetails( DB *mysql_db.DB, tablesTableName, pokerTablesTableName, ta
 	                               &tableDetails.GameState)
 	utils.CheckError(err)
 
-	query = fmt.Sprintf(`SELECT community_cards
+	query = fmt.Sprintf(`SELECT community_cards, money_in_pot
 	                     FROM %s
 						 WHERE table_id = %s`, pokerTablesTableName, tableID)
 
-	err = db.QueryRow(query).Scan(&tableDetails.CommunityCards)
+	err = db.QueryRow(query).Scan(&tableDetails.CommunityCards, &tableDetails.MoneyInPot)
 	
 	utils.CheckError(err)
 

@@ -18,6 +18,18 @@ var testingTablesTableName = envs["TESTING_TABLES_TABLE"]
 var testingPlayersTableName = envs["TESTING_PLAYERS_TABLE"]
 var testingPokerTableName = envs["TESTING_POKER_TABLES_TABLE"]
 
+
+func TestGameInProgress(t *testing.T) {
+	
+	tableID := "1"
+	
+	inProgress := GameInProgress(DB, testingTablesTableName, tableID)
+
+	if ! inProgress {
+		t.Error("Game should be in progress")
+	}
+}
+
 func TestGetNumberOfPlayersAtTable(t *testing.T) {
 	
 	tableID := "1"
@@ -75,6 +87,17 @@ func TestGetNextAvailableSeat(t *testing.T) {
 func TestGetPlayersFunds(t *testing.T) {
 	username := "derek"
 	
+	playersMoneyInPot := GetPlayersMoneyInPot(DB, testingPlayersTableName, username)
+
+	if playersMoneyInPot != 0.0 {
+		t.Errorf("%s should have 30.00 funds", username)
+	}
+	fmt.Println(playersMoneyInPot)
+}
+
+func TestGetPlayersMoneyInPot(t *testing.T) {
+	username := "derek"
+	
 	funds := GetPlayersFunds(DB, testingPlayersTableName, username)
 
 	if funds != 30.00 {
@@ -128,4 +151,12 @@ func TestGetHighestBidder(t *testing.T) {
 	if bid == 0 {
 		t.Error("bidders name could not be retrieved")
 	}
+}
+
+
+func TestGetCommunityCards(t *testing.T) {
+
+	tableID := "1"
+
+	GetCommunityCards(DB, testingPokerTableName, tableID)
 }

@@ -60,8 +60,8 @@ func changeOldTable(tx *sql.Tx, tablesTableName, username string) (tableID strin
 	return tableID, changed
 }
 func changeOldPokerTable(tx *sql.Tx, pokerTablesTableName, tableID, dealer string) (changed bool) {
-	columnNames := "table_id, community_cards, highest_bidder, highest_bid, dealer"
-	values := fmt.Sprintf( "%s, '', '', 0.0, '%s'", tableID, dealer )
+	columnNames := "table_id, community_cards, highest_bidder, highest_bid, dealer, money_in_pot"
+	values := fmt.Sprintf( "%s, '', '', 0.0, '%s', 0.0", tableID, dealer )
     
 	numOfRowsAffected, inserted := insert.InsertTableEntry(tx, pokerTablesTableName, columnNames, values)
 	if ! inserted {
@@ -97,9 +97,10 @@ func insertNewPokerTable(tx *sql.Tx, pokerTablesTableName, tableID, username str
 	highestBidder := ""
 	highestBid := "0.0"
 	dealer := username
+	moneyInPot := "0.0"
 
-	columnNames := `table_id, community_cards, highest_bidder, highest_bid, dealer`
-	values := fmt.Sprintf(`%s, "%s", "%s", %s, "%s"`, tableID, communityCards, highestBidder, highestBid, dealer)
+	columnNames := `table_id, community_cards, highest_bidder, highest_bid, dealer, money_in_pot`
+	values := fmt.Sprintf(`%s, "%s", "%s", %s, "%s", %s`, tableID, communityCards, highestBidder, highestBid, dealer, moneyInPot)
 	
 	_, inserted = insert.InsertTableEntry(tx, pokerTablesTableName, columnNames, values)
 	if ! inserted {
