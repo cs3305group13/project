@@ -14,6 +14,7 @@ type gameDetails struct {
 	TableDetails *tableDetails
 }
 
+// retrieves detaiols about the game state as a JSON object
 func JSONGameDetails(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username string) []byte {
 
 	tableDetails := getTableDetails(DB, tablesTableName, pokerTablesTableName, tableID)

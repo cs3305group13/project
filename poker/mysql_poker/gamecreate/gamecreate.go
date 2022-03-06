@@ -10,6 +10,7 @@ import (
 	"github.com/cs3305/group13_2022/project/mysql_db/insert"
 )
 
+// assigns a new table for the user requesting it
 func AssignNewTable( tx *sql.Tx, tablesTableName, pokerTablesTableName, username string ) (tableID string) {
 	tableID, found := changeOldTable(tx, tablesTableName, username)
 
@@ -59,6 +60,7 @@ func changeOldTable(tx *sql.Tx, tablesTableName, username string) (tableID strin
 	tableID = strconv.FormatInt(id, 10)
 	return tableID, changed
 }
+
 func changeOldPokerTable(tx *sql.Tx, pokerTablesTableName, tableID, dealer string) (changed bool) {
 	columnNames := "table_id, community_cards, highest_bidder, highest_bid, dealer, money_in_pot"
 	values := fmt.Sprintf( "%s, '', '', 0.0, '%s', 0.0", tableID, dealer )
@@ -74,6 +76,7 @@ func changeOldPokerTable(tx *sql.Tx, pokerTablesTableName, tableID, dealer strin
 		}
 	}
 }
+
 
 func insertNewTable(tx *sql.Tx, tablesTableName, username string) (tableID string, inserted bool) {
 	deck := cards.NewDeck(1)
@@ -92,6 +95,7 @@ func insertNewTable(tx *sql.Tx, tablesTableName, username string) (tableID strin
 
 	return tableID, inserted
 }
+
 func insertNewPokerTable(tx *sql.Tx, pokerTablesTableName, tableID, username string) (inserted bool) {
 	communityCards := ""
 	highestBidder := ""

@@ -6,6 +6,7 @@ import (
 
 	"github.com/cs3305/group13_2022/project/cards"
 	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gamecards"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameflow"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
 	"github.com/cs3305/group13_2022/project/utils"
@@ -13,6 +14,7 @@ import (
 	"github.com/chehsunliu/poker"
 )
 
+// retreives player cards and compares them with the community cards to determine winner
 func ShowDown(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
 	
 	players := gameinfo.GetPlayersAndCards(DB, playersTableName, tableID)
@@ -72,7 +74,7 @@ func getEndOfGameCommunityCards(DB *mysql_db.DB, tablesTableName, playersTableNa
 	return pokerCommunityCards
 }
 
-
+// sets winning players state to "Winner" and adds money_in_pot to the users funds
 func SetWinner(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username string) {
 
 	db := mysql_db.EstablishConnection(DB)

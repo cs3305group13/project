@@ -12,14 +12,8 @@ import (
 	"github.com/cs3305/group13_2022/project/utils"
 )
 
-
-<<<<<<< HEAD
+// takes specified amount from the player, updates their money_in_pot entry and also adds it to the game pot
 func TryTakeMoneyFromPlayer(DB *mysql_db.DB, playersTableName, tableID, playerName, bid string) (taken bool) {
-=======
-
-
-func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, pokerTablesTableName, tableID, playerName, bid string) (taken bool) {
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 	playersFunds := gameinfo.GetPlayersFunds(DB, playersTableName, playerName)
 	
 	playersBid, err := strconv.ParseFloat(bid, 64)
@@ -34,7 +28,6 @@ func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, poker
 	defer db.Close()
 
 	query := fmt.Sprintf(`UPDATE %s
-<<<<<<< HEAD
 	                      SET funds = funds - %v
 						  money_in_pot = money_in_pot + %v
 						  WHERE username = "%s";`, playersTableName, playersBid, playersBid, playerName)
@@ -46,25 +39,13 @@ func TryTakeMoneyFromPlayer(DB *mysql_db.DB, tx *sql.Tx, playersTableName, poker
 						 WHERE table_id = %s;`, pokerTablesTableName, bid, tableID)
 
 	_, err = db.Exec(query)
-=======
-	                      SET funds = funds - %v,
-						      money_in_pot = money_in_pot + %v
-						  WHERE username = "%s";`, playersTableName, playersBid, playersBid, playerName)
-	_, err = tx.Exec(query)
-	utils.CheckError(err)
-
-	query = fmt.Sprintf(`UPDATE %s
-	                     SET money_in_pot = money_in_pot + %v
-						 WHERE table_id = %s;`, pokerTablesTableName, bid, tableID)
-
-	_, err = tx.Exec(query)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 	utils.CheckError(err)
 
 	taken = true
 	return taken
 }
 
+// checks if this player is the player set as 'current_player_making_move' in 'tables' table
 func PlayersTurn(DB *mysql_db.DB, tablesTableName, playersTableName, tableID, username string) bool {
 
 	currentPlayerMakingMove, _ := gameinfo.GetCurrentPlayerMakingMove(DB,tablesTableName, playersTableName, tableID)
@@ -76,12 +57,8 @@ func PlayersTurn(DB *mysql_db.DB, tablesTableName, playersTableName, tableID, us
 	return false
 }
 
-
-<<<<<<< HEAD
+// sets players state to 'FOLDED' and checks what effect this has on the game
 func PlayerFolded(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber string, nextPlayerFoundBool bool) {
-=======
-func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber string, nextPlayerFoundBool bool) {
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 	
 	numberOfPlayersAllIn := gameinfo.GetNumberOfPlayersAllIn(DB, playersTableName, tableID)
 
@@ -90,7 +67,6 @@ func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName
 	
 	if numberOfPlayersAllIn == 0 && numberOfPlayersStillPlaying == 2 {
 		nextAvailablePlayer := gameflow.NextAvailablePlayer(DB, playersTableName, tableID, username, seatNumber)
-<<<<<<< HEAD
 		gameshowdown.SetWinner(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, nextAvailablePlayer)
 	}
 	if ! nextPlayerFoundBool && numberOfPlayersStillPlaying == 1{
@@ -99,16 +75,6 @@ func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName
 
 	} else if ! nextPlayerFoundBool && numberOfPlayersStillPlaying > 1{
 		gameshowdown.ShowDown(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
-=======
-		gameshowdown.SetWinner(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, nextAvailablePlayer)
-	}
-	if ! nextPlayerFoundBool && numberOfPlayersStillPlaying == 1{
-		gameshowdown.SetWinner(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
-		return
-
-	} else if ! nextPlayerFoundBool && numberOfPlayersStillPlaying > 1{
-		gameshowdown.ShowDown(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
 	} else {
 		// if here then there are still other players playing therefore this player can fold
@@ -132,11 +98,9 @@ func PlayerFolded(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName
 	}
 }
 
-<<<<<<< HEAD
+// sets player's state relative to the amount they are willing to give the pot. this also
+// redirects to PlayerFolded() if the amount is less than the highest_bid for this round
 func PlayerTakesAction(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, amount string) (action string) {
-=======
-func PlayerTakesAction(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, amount string) (action string) {
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 	amountAsFloat64 := utils.ConvertToFloat(amount)
 	playersMoneyCurrentlyInPot := gameinfo.GetPlayersMoneyInPot(DB, playersTableName, username)
 
@@ -147,17 +111,12 @@ func PlayerTakesAction(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTabl
 	playersFunds := gameinfo.GetPlayersFunds(DB, playersTableName, username)
 
 	setOperation := "current_player_making_move = "
-<<<<<<< HEAD
 	successful := gameflow.SetNextAvailablePlayerAfterThisOne(DB, tablesTableName, playersTableName, tableID, username, seatNumber, setOperation)
-=======
-	successful := gameflow.SetNextAvailablePlayerAfterThisOne(DB, tx, tablesTableName, playersTableName, tableID, username, seatNumber, setOperation)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
 	numberOfPlayersStillPlaying := gameinfo.GetNumberOfPlayersStillPlaying(DB, playersTableName, tableID, username, seatNumber)
 	// ^ contains number of players still in game (this player who wants to fold, players still playing, and all in players)
 
 	if ! successful && numberOfPlayersStillPlaying == 1{
-<<<<<<< HEAD
 		gameshowdown.SetWinner(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
 		return
 
@@ -182,33 +141,12 @@ func PlayerTakesAction(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTabl
 
 	} else if playersMoneyInPot < highestBid {
 		PlayerFolded(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, successful)
-=======
-		gameshowdown.SetWinner(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
-		return
-
-	} else if ! successful && numberOfPlayersStillPlaying > 1{
-		gameshowdown.ShowDown(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
-
-	}
-
-	if amountAsFloat64 >= playersFunds {
-		playerAllIn(tx, playersTableName, username)
-		action = "ALL_IN"
-
-	} else if highestBid == 0.0 && playersMoneyInPot == 0.0 {
-		playerChecked(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
-		action = "CHECKED"
-
-	} else if playersMoneyInPot < highestBid {
-		PlayerFolded(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, successful)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 		action = "FOLDED"
 
 		return action
 	
 	} else if playersMoneyInPot < highestBid*2 {
 		// if here raise amount was not at least double of previous highest bid
-<<<<<<< HEAD
 
 		// set amount to be amount needed for user to match highestBid
 		amount = fmt.Sprintf(`%f`, highestBid - playersMoneyCurrentlyInPot)  
@@ -218,14 +156,6 @@ func PlayerTakesAction(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTabl
 
 	} else if playersMoneyInPot >= highestBid*2 {
 		playerRaised(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, amount)
-=======
-		playerCalled(tx, playersTableName, username)
-		action = "CALLED"
-
-
-	} else if playersMoneyInPot >= highestBid*2 {
-		playerRaised(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, amount)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 		action = "RAISED"
 
 	}
@@ -337,15 +267,7 @@ func playerChecked( DB *mysql_db.DB, tablesTableName, playersTableName, pokerTab
 	                      SET player_state = "CHECKED"
 						  WHERE username = "%s";`, playersTableName, username)
 
-<<<<<<< HEAD
 	_, err := db.Exec(query)
-=======
-	query := fmt.Sprintf(`UPDATE %s
-	                      SET player_state = "CHECKED"
-						  WHERE username = "%s";`, playersTableName, username)
-
-	_, err := tx.Exec(query)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 	if err != sql.ErrNoRows {
 		utils.CheckError(err)
 	}

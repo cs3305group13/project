@@ -225,6 +225,7 @@ func GetNextAvailableSeat(DB *mysql_db.DB, playersTableName, tableID string) (ne
 	}
 }
 
+// gets this players funds
 func GetPlayersFunds(DB *mysql_db.DB, playersTableName, username string) (funds float64) {
 	
 	db := mysql_db.EstablishConnection(DB)
@@ -240,6 +241,7 @@ func GetPlayersFunds(DB *mysql_db.DB, playersTableName, username string) (funds 
 	return funds
 }
 
+// gets this players total money in pot for this round
 func GetPlayersMoneyInPot(DB *mysql_db.DB, playersTableName, username string) (moneyInPot float64) {
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()

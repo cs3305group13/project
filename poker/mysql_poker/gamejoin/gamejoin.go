@@ -26,6 +26,7 @@ func CheckTableExists( tx *sql.Tx, tablesTableName, tableCode string ) bool {
 func UpdatePlayersSelectedGame(DB *mysql_db.DB, tx *sql.Tx, playersTableName, tableID, username, seatNumber string) (funds string) {
 	userFunds := gameinfo.GetPlayersFunds(DB, playersTableName, username)
 
+	// prevent user from entering game with less than 5 funds
 	if userFunds < 5.0 {
 		userFunds = 30.0
 	}
@@ -46,7 +47,10 @@ func UpdatePlayersSelectedGame(DB *mysql_db.DB, tx *sql.Tx, playersTableName, ta
 }
 
 
-// Used for add ing player to players table when signing up
+// Used for adding player to players table when signing up
+//
+// triggered when user signs up
+
 func AddPlayer(tx *sql.Tx, playersTableName, username, funds string) bool {
 
 	columnNames := `username, funds, table_id, seat_number, player_state, player_cards, money_in_pot, time_since_request`

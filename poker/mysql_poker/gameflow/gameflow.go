@@ -43,6 +43,7 @@ func UpdateUsersTimeSinceRequest(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, p
 // Method used to update next player who holds the responsibility.
 // 
 // setOperation := "highest_bidder = "
+//
 <<<<<<< HEAD
 func SetNextAvailablePlayerAfterThisOne(DB *mysql_db.DB, tableName, playersTableName, tableID, username, seatNumber, setOperation string) (successful bool ) {
 =======
