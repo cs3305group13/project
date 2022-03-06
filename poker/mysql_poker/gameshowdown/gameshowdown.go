@@ -13,28 +13,16 @@ import (
 	"github.com/chehsunliu/poker"
 )
 
-<<<<<<< HEAD
 func ShowDown(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
 	
 	players := gameinfo.GetPlayersAndCards(DB, playersTableName, tableID)
 	
 	pokerCommunityCards := getEndOfGameCommunityCards(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
-=======
-func ShowDown(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
-	
-	players := GetPlayersAndCards(DB, playersTableName, tableID)
-	
-	pokerCommunityCards := getEndOfGameCommunityCards(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
     
 	
 	for i:=0; i<len(players); i++ {
 		var playersCards []poker.Card
-<<<<<<< HEAD
 		extractedPlayerCards := cards.ExtractDeck(players[i].Cards)
-=======
-		extractedPlayerCards := cards.ExtractDeck(players[i].cards)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 		card1 := (*extractedPlayerCards)[0]
 		card2 := (*extractedPlayerCards)[1]
 
@@ -47,26 +35,16 @@ func ShowDown(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, po
 
 		cardsScore := poker.Evaluate( playerCardsAndCommunityCards )
 
-<<<<<<< HEAD
 		players[i].Score = int(cardsScore)
-=======
-		players[i].score = int(cardsScore)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 	}
 
 	// decide winner
 	var winner string
 	bestScore := 10000  // the lower the number the better the hand
 	for i:=0; i<len(players); i++ {
-<<<<<<< HEAD
 		if bestScore > players[i].Score {
 		    bestScore = players[i].Score
 			winner = players[i].Username
-=======
-		if bestScore > players[i].score {
-		    bestScore = players[i].score
-			winner = players[i].username
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 		}
 
 	}
@@ -79,6 +57,10 @@ func getEndOfGameCommunityCards(DB *mysql_db.DB, tablesTableName, playersTableNa
 	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
 
 
+	// while the number of community cards is not equal 5, then add another card
+	for len( *gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID) ) != 5 {
+		gamecards.AddCommunityCards(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, false )
+	} 
 	// translate community cards to match chehsunliu implementation
 	var pokerCommunityCards []poker.Card
 	for i:=0; i<len(*communityCards); i++ {
