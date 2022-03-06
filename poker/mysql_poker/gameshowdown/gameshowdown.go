@@ -71,48 +71,11 @@ func ShowDown(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, po
 
 	}
 
-<<<<<<< HEAD
 	SetWinner(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, winner)
 }
 
 
 func getEndOfGameCommunityCards(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) []poker.Card {
-=======
-	SetWinner(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, winner)
-}
-
-type player struct {
-	username string
-	cards string
-	score int
-}
-
-func GetPlayersAndCards(DB *mysql_db.DB, playersTableName, tableID string) (players []player) {
-	db := mysql_db.EstablishConnection(DB)
-	defer db.Close()
-
-	query := fmt.Sprintf(`SELECT username, player_cards
-	                      FROM %s
-						  WHERE table_id = %s AND 
-						       player_state IN ("PLAYING", "ALL_IN", "RAISED", "CALLED", "CHECKED");`, playersTableName, tableID)
-
-	
-	rows, err := db.Query(query)
-	utils.CheckError(err)
-	
-	var p player
-	for rows.Next() {
-		err := rows.Scan(&p.username, &p.cards)
-		utils.CheckError(err)
-
-		players = append(players, p)
-	}
-
-	return players
-}
-
-func getEndOfGameCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) []poker.Card {
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
 
 
@@ -170,11 +133,7 @@ func SetWinner(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTa
 
 
 // method called if game state is to be reset .ie game ended
-<<<<<<< HEAD
 func resetGameState(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
-=======
-func resetGameState(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) {
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
@@ -182,12 +141,11 @@ func resetGameState(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableNa
 	_, _, dealer, dealerSeatNumber := gameinfo.GetDealerAndHighestBidder(DB, playersTableName, pokerTablesTableName, tableID)
 
 	setOperation := "current_player_making_move = "
-<<<<<<< HEAD
 	gameflow.SetNextAvailablePlayerAfterThisOne(DB, tablesTableName, playersTableName, tableID, dealer, dealerSeatNumber, setOperation)
-=======
-	gameflow.SetNextAvailablePlayerAfterThisOne(DB, tx, tablesTableName, playersTableName, tableID, dealer, dealerSeatNumber, setOperation)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
+	setOperation = "dealer = "
+	gameflow.SetNextAvailablePlayerAfterThisOne(DB, pokerTablesTableName, playersTableName, tableID, dealer, dealerSeatNumber, setOperation)
+	
 	query := fmt.Sprintf(`UPDATE %s
 	                      SET game_in_progress = false
 						  WHERE table_id = %s`, tablesTableName, tableID)
@@ -196,8 +154,4 @@ func resetGameState(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableNa
 	_, err := db.Exec(query)
 
 	utils.CheckError(err)
-<<<<<<< HEAD
-
-=======
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 }
