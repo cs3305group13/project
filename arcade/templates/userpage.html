@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Protected Page</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+        <title>User Page</title>
+        <link rel="stylesheet" type="text/css" href="../static/css/main.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Jockey+One&display=swap" rel="stylesheet">
         <!-- <script src="/static/js/protected.js"></script> -->
     </head>
     <body>
-        <h1>Welcome to your page!</h1>
+        <h1 class="row">♠♣♥♦ Poker Game ♦♥♣♠</h1>
+        <h2 class="usr">Welcome to your page {{.Username}}!</h2>
+        <div class="forms">
 
         <h2 id="problem">{{.}}</h2>
         <form action="" method="post">
             <fieldset>
 
-                <legend>Poker</legend>
+                <legend>Games</legend>
 
                 <input type="radio" id="poker_online" name="poker" value="poker_online" checked>
                 <label for="poker_online">Online</label>
@@ -24,22 +29,40 @@
                 <label for="poker_offline">Offline</label>
 
                 <input type="submit" value="Play" >
+                <img class="poker" src="../../htmlpictures/pokerchips.png"
+                width="20%" height="15%"/>
+               <p class="instructions">Play a game of classic poker with friends,
+                using a unique code, jump right to the table and start playing.
+                Or join a random game and play with others
+              </p>
 
             </fieldset>
         </form>
-        <!-- <form action="" method="post">
+     
+        <form class="form" action="" method="post">
             <fieldset>
-
-                <legend>Blackjack</legend>
-                
-                <label for="blackjack_online" >Online:</label>
-                <input type="button" id="blackjack_online" name="blackjack_online" >
-                
-                <label for="blackjack_offline" >Offline:</label>
-                <input type="button" id="blackjack_offline" name="blackjack_offline" >
-
+                <img class="adventure" src="../../htmlpictures/pixelguy.png"
+                  width="17%" height="12%" />
+                <input type="submit" value="Adventure Game" name="submit">
+                <p class="instructions">Earn virtual coins that can be used in
+                  the poker game through this adventure side scroller game
+                </p>
             </fieldset>
-        </form> -->
+        </form>
+
+        <form class="form" action="" method="post">
+            <fieldset>
+                <input type="submit" value="Blackjack Game" name="submit">
+                <img class="blackjack" src="../../htmlpictures/blackjack.png"
+                     width="20%" height="10%"/>
+                <p class="instructions">Beat the dealer's hand without going over 21. Both you and
+                  the dealer start with two cards, but one of the dealer's cards
+                is hidden till then end. If you go over 21 you bust, and the
+                  dealer wins regardless of their hand
+               </p>
+            </fieldset>
+        </form>
+      </div>
 
     </body>
 </html>
