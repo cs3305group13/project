@@ -128,48 +128,43 @@ func getEndOfGameCommunityCards(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, pl
 }
 
 
-<<<<<<< HEAD
 func SetWinner(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username string) {
 
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
-=======
-func SetWinner(DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username string) {
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
 	query := fmt.Sprintf(`SELECT money_in_pot
 	                      FROM %s
 						  WHERE table_id = %s;`, pokerTablesTableName, tableID)
 
 	var moneyInPot string
-<<<<<<< HEAD
 	err := db.QueryRow(query).Scan(&moneyInPot)
-=======
-	err := tx.QueryRow(query).Scan(&moneyInPot)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
 	utils.CheckError(err)
+
+	// reset the poker table pot
+	query = fmt.Sprintf(`UPDATE %s
+		SET money_in_pot = 0.0
+		WHERE table_id = %s;`, pokerTablesTableName, tableID))
+
+		_, err = db.Exec(query)
+
+		if err != sql.ErrNoRows {
+			utils.CheckError(err)
+		}
 	
 	query = fmt.Sprintf(`UPDATE %s
 	                     SET player_state = "WINNER",
 						     funds = funds + %s
 						 WHERE table_id = %s AND username = "%s";`, playersTableName, moneyInPot, tableID, username)
 
-<<<<<<< HEAD
 	_, err = db.Exec(query)
-=======
-	_, err = tx.Exec(query)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
 	if err != sql.ErrNoRows {
 	    utils.CheckError(err)
 	}
 
-<<<<<<< HEAD
 	resetGameState(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
-=======
-	resetGameState(DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 }
 
 
