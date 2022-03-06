@@ -68,7 +68,7 @@ func TestReadyUpPlayer(t *testing.T) {
 	readyUpPlayer(w, DB, tx, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID, username)
 }
 
-func TestStartGame(t *testing.T) {
+func TestInitGame(t *testing.T) {
 	
 	db := mysql_db.EstablishConnection(DB)
 	tx := mysql_db.NewTransaction(db)
@@ -77,7 +77,7 @@ func TestStartGame(t *testing.T) {
 
 	tableID := "1"
 
-	startGame(tx, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID)
+	initGame(tx, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID)
 }
 
 func TestTryReadyUpPlayer(t *testing.T) {
