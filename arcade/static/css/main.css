@@ -1,3 +1,101 @@
 body {
-    background-color: teal;
-}
+    background-image: url("../../flyingcards.png");
+    height:100%;
+    background-position: center;
+    background-repeat: repeat;
+    font-family: 'Jockey One', sans-serif;
+    background-size: 500px;
+  }
+  
+  h1 {
+     color:#b8061a;
+     font-family: 'Jockey One', sans-serif;
+     margin: 0 auto;
+     text-align: center;
+     text-shadow: 2px 2px black;
+     border-color: black;
+     border-style: solid;
+     border-width: thin;
+  
+  }
+  
+  .login, h2 span, p span .form {
+    background-color: white;
+  }
+  
+  form {
+    width: 80%;
+  }
+  input[type=text], input[type=password] {
+    border: 1.5px solid #b8061a;
+  
+  }
+  input[type=submit] {
+      font-family: 'Jockey One', sans-serif;
+  }
+  input[type=submit]:hover {
+    background-color: #b8061a;
+    color: white;
+  }
+  
+  .instructions {
+    font-size: 13px;
+  }
+  .blackjack, .poker, .adventure {
+    float: right;
+  }
+  
+  div.forms {
+    display: block;
+    text-align: center;
+  }
+  form {
+      display: inline-block;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+  }
+  
+  .browntable {
+    background-color:#693616;
+    width: 700px;
+    height: 450px;
+    border-radius: 50%;
+    text-align: center;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+  }
+  .greentable {
+    background-color:#0b700b;
+    width: 680px;
+    height: 430px;
+    border-radius: 50%;
+    margin: 0 auto;
+  }
+  .cards {
+    position: relative;
+  }
+  .usr {
+    color: black;
+    font-family: 'Jockey One', sans-serif;
+    margin: 0 auto;
+    text-align: center;
+    text-shadow: 2px 2px #d42436;
+  }
+  
+  h2 {
+      text-shadow: 1px 1px #d42436;
+      text-align: center;
+  }
+  
+  form {
+      margin-left: 40%;
+      margin-right: 40%;
+      width: 20%
+  }
+  .srtinfo {
+      text-align: center;
+      background-color: white;
+  }
+  

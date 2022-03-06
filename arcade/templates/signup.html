@@ -2,29 +2,40 @@
 <html>
     <head>
         <title>Sign Up Page</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+        <link rel="stylesheet" type="text/css" href="../../static/css/main.css" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Jockey+One&display=swap" rel="stylesheet">
     </head>
     <body>
-        <h1>Welcome to the Signup Page page!</h1>
-        <form action="" method="post" >
+        <div class="welcome" >
+            <h1 class="row">♠♣♥♦ Poker Game ♦♥♣♠</h1>
+            <h2><span>Sign Up Page</span></h2>
+            <p class="srtinfo"><span>Complete the form below to create an account to start playing poker
+              games online with friends!</span></p>
+        </div>
+        <div class="formbox" >
+        <form class="login" action="" method="post" >
             <fieldset>
                 <legend>Login</legend>
                 <label for="username_ID" >Username:</label>
-                <input type="text" id="username_ID" name="username" ></input>
+                <input type="text" id="username_ID" name="username"  placeholder="Username"></input><br>
                 <span>{{.UsernameProblem}}</span>
 
-                <label for="password_00_ID" >Password:</label>
-                <input type="password" id="password_00_ID" name="password_00" ></input>
+                <br><label for="password_00_ID" >Password:</label>
+                <input type="password" id="password_00_ID" name="password_00" placeholder="Password" ></input><br>
 
-                <label for="password_01_ID" >Confirm Password:</label>
-                <input type="password" id="password_01_ID" name="password_01" ></input>
+                <br><label for="password_01_ID" >Confirm Password:</label>
+                <input type="password" id="password_01_ID" name="password_01" placeholder="Password" ></input>
                 <span>{{.PasswordProblem}}</span>
 
-                <input type="submit" value="Submit">
+                <br><input type="submit" value="Submit">
 
                 {{/* Displays error message */}}
                 <span>{{.GeneralProblem}}</span>
             </fieldset>
         </form>
+        </div>
     </body>
 </html>
