@@ -139,12 +139,9 @@ func beginGame(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTa
 						  SET community_cards = " ",
 							  highest_bidder = "%s",
 						  	  highest_bid = "%s",
-							  money_in_pot = 0.0
 						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, tableID)
 =======
-						  SET highest_bidder = "%s",
-						      highest_bid = "%s"
-						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, bigBlindAmount, tableID)
+						  
 >>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
 	_, err := db.Exec(query)  // result is ignored because TryTakeMoneyFromPlayers updates highestBidder
