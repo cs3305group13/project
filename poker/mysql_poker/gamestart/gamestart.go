@@ -36,11 +36,11 @@ func TryReadyUpPlayer(w http.ResponseWriter, r *http.Request, DB *mysql_db.DB, t
 
 		begin := readyUpPlayer(w, DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
 		err := tx.Commit()
+		utils.CheckError(err)
 
 		if begin {
 			beginGame(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 		}
-		utils.CheckError(err)
 		
 		return
 	}
@@ -123,22 +123,23 @@ func beginGame(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTa
 
 	smallBlindAmount := "1.0"
 	bigBlindAmount := "2.0"
-	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, pokerTablesTableName, tableID, smallBlind, smallBlindAmount)
-	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, pokerTablesTableName, tableID, bigBlind, bigBlindAmount)
 
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
 
-	// initialize the big blind as the highest bidder
+	// initialize the big blind as the highest bidder and reset money_in_pot
 	query := fmt.Sprintf(`UPDATE %s
 						  SET community_cards = "",
 						      highest_bidder = "%s",
 						      highest_bid = "%s",
-							  money_in_pot = 0.0
+							  money_in_pot = "0.0"
 						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, bigBlindAmount, tableID)
 
 	_, err := db.Exec(query)  // result is ignored because TryTakeMoneyFromPlayers updates highestBidder
 	utils.CheckError(err)
+
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, pokerTablesTableName, tableID, smallBlind, smallBlindAmount)
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, pokerTablesTableName, tableID, bigBlind, bigBlindAmount)
 
 	// set the current player as the player after the big blind
     query = fmt.Sprintf(`UPDATE %s
