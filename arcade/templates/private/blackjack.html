@@ -6,10 +6,16 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Jockey+One&display=swap" rel="stylesheet">
+        <script src="../../static/js/game.js"></script>
         <!-- <script src="/static/js/protected.js"></script> -->
     </head>
     <body>
         <h1 class="row">♠♣♥♦ Poker Game ♦♥♣♠</h1>
         <h2 class="usr">Welcome to Blackjack {{.Username}}!</h2>
+        <input type="text" placeholder="Please enter your name" id="user1">
+        <!-- <input type="text" placeholder="Please enter your name" id="user2">
+        <input type="text" placeholder="Please enter your name" id="user3">
+        <input type="text" placeholder="Please enter your name" id="user4"> -->
+        <input type="button" id="btnStart" value="start" onclick="startGame()">
     </body>
 </html>
