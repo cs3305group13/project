@@ -1,3 +1,6 @@
+* {
+  box-sizing: border-box;
+}
 body {
     background-image: url("../media/cardgames/flyingcards.png");
     height:100%;
@@ -30,16 +33,17 @@ body {
     border: 1.5px solid #b8061a;
   
   }
-  input[type=submit] {
+  input[type=submit], input[type=button] {
       font-family: 'Jockey One', sans-serif;
   }
-  input[type=submit]:hover {
+  input[type=submit]:hover,input[type=button]:hover {
     background-color: #b8061a;
     color: white;
   }
   
   .instructions {
     font-size: 13px;
+    background-color: white;
   }
   .blackjack, .poker, .adventure {
     float: right;
@@ -54,24 +58,6 @@ body {
       margin-left: auto;
       margin-right: auto;
       text-align: left;
-  }
-  
-  .browntable {
-    background-color:#693616;
-    width: 700px;
-    height: 450px;
-    border-radius: 50%;
-    text-align: center;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-  }
-  .greentable {
-    background-color:#0b700b;
-    width: 680px;
-    height: 430px;
-    border-radius: 50%;
-    margin: 0 auto;
   }
   .cards {
     position: relative;
@@ -99,3 +85,26 @@ body {
       background-color: white;
   }
   
+  legend, .tblcd {
+    background-color: white;
+  }
+
+  .column {
+    float: left;
+    width: 25%;
+  }
+
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  
+  .table {
+    background-color:#22823f;
+    text-align: center;
+  }
+
+  #flipimg {
+    transform: scaleX(-1);
+  }
