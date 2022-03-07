@@ -36,7 +36,7 @@ func checkForm( w http.ResponseWriter, r *http.Request ) {
 				http.Redirect(w, r, "pokertable", http.StatusMovedPermanently)
 			}
 
-		case "adventure_game" :
+		case "royal runner" :
 			http.Redirect(w, r, "adventure_game", http.StatusMovedPermanently)
 
 	    case "blackjack" :
