@@ -4,7 +4,7 @@
         <title>Protected Page</title>
         <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
         <script src="/static/js/getcontent.js"></script>
-        <script src="/static/js/gamebuttons.js"></script>
+        <script src="/static/js/gamebutton.js"></script>
     </head>
     <body>
 
@@ -14,9 +14,9 @@
         <h1 hidden id="hidden_seatnumber_tag" >{{.SeatNumber}}</h1>
         <h1 hidden id="hidden_funds_tag">{{.Funds}}</h1>
 
-        <ul>
+        <ul id="game_details" >
             <li>
-                <span>Pot: <span id="main_pot" ></span></span>
+                <span>Pot: <span id="money_in_pot" ></span></span>
             </li>
             <li>
                 <span>Player Making Move: <span id="current_player_making_move" ></span></span>
@@ -101,8 +101,8 @@
             </li>
         </ul>
 
-        <span id="general_message_span"></span>
-        <span id="problem_message_span"></span>
+        <span class="problem_message" id="general_message_span"></span>
+        <span class="problem_message" id="problem_message_span"></span>
 
         <form id="player_state_button_form" >
             <fieldset>

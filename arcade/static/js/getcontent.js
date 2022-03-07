@@ -126,11 +126,11 @@ function insertDetailsIntoHTML( tableDetails ) {
 
     let gameButtonsFormTAG = document.querySelector("#game_buttons_form");
     if ( hiddenUsernameTAG.innerHTML === currentPlayerMakingMoveTAG.innerHTML && gameState == 1 ) {
-        SeatTAG.style.backgroundColor = "cadetblue";
+        SeatTAG.style.backgroundColor = "grey";
         gameButtonsFormTAG.style.display = "block";
         
     } else {
-        SeatTAG.style.backgroundColor = "blue";
+        SeatTAG.style.backgroundColor = "lightgrey";
         gameButtonsFormTAG.style.display = "none";
     }
 
