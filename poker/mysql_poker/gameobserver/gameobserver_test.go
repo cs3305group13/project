@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/testing/mysql_poker"
 	"github.com/cs3305/group13_2022/project/utils/env"
 )
 
@@ -14,7 +15,7 @@ var testingTablesTableName = envs["TESTING_TABLES_TABLE"]
 var testingPlayersTableName = envs["TESTING_PLAYERS_TABLE"]
 var testingPokerTablesTableName = envs["TESTING_POKER_TABLES_TABLE"]
 
-func TestGameObserver( t *testing.T) {
+func TestGameObserver(t *testing.T) {
 
 	mysql_poker.RefreshTablesTable(DB)
 	mysql_poker.RefreshPlayerTable(DB)
@@ -23,6 +24,7 @@ func TestGameObserver( t *testing.T) {
 	tableID := "1"
 
 	GameObserver(DB, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID)
+
 }
 
 func TestFindIdleImportantUser(t *testing.T) {
@@ -43,5 +45,6 @@ func TestRemoveIdleUsers(t *testing.T) {
 	tableID := "1"
 
 	removeIdleUsers(DB, testingTablesTableName, testingPlayersTableName, testingPokerTablesTableName, tableID)
+
 }
 

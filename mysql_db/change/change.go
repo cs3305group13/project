@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/cs3305/group13_2022/project/mysql_db"
 	"github.com/cs3305/group13_2022/project/utils"
 )
 
@@ -31,7 +32,7 @@ func ChangeValueInRows(tx *sql.Tx, tableName, compareColumnName, valueToBeCompar
 	
 	utils.CheckError(err)
 
-	numOfRowsAffected = utils.GetNumberOfRowsAffected(res)
+	numOfRowsAffected = mysql_db.GetNumberOfRowsAffected(res)
 
 	if numOfRowsAffected == 0 {
 		return numOfRowsAffected, false
@@ -68,7 +69,7 @@ func CreateRowFromRowOlderThan(tx *sql.Tx, tableName, primaryKey, timeColumn, ho
 	result, err := tx.Exec(execQuery)
 	utils.CheckError(err)
 	
-	numberOfRowsAffected := utils.GetNumberOfRowsAffected(result)
+	numberOfRowsAffected := mysql_db.GetNumberOfRowsAffected(result)
 	if numberOfRowsAffected != 1 {
 		panic("One row should have been affected here.")
 	}

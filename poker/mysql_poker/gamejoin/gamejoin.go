@@ -50,7 +50,6 @@ func UpdatePlayersSelectedGame(DB *mysql_db.DB, tx *sql.Tx, playersTableName, ta
 // Used for adding player to players table when signing up
 //
 // triggered when user signs up
-
 func AddPlayer(tx *sql.Tx, playersTableName, username, funds string) bool {
 
 	columnNames := `username, funds, table_id, seat_number, player_state, player_cards, money_in_pot, time_since_request`

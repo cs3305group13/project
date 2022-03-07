@@ -21,7 +21,18 @@ body {
      border-width: thin;
   
   }
+
+  #game_details {
+      border: solid black .1em;
+      background-color: grey;
+  }
   
+  .problem_message {
+      display: block;
+      text-align: center;
+      background-color: lightgrey;
+  }
+
   .login, h2 span, p span .form {
     background-color: white;
   }
@@ -54,9 +65,11 @@ body {
     text-align: center;
   }
   form {
+      background-color: lightgrey;
       display: inline-block;
       margin-left: auto;
       margin-right: auto;
+      border: solid black .1em;
       text-align: left;
   }
   .cards {

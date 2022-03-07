@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cs3305/group13_2022/project/utils"
+	"github.com/cs3305/group13_2022/project/mysql_db"
 )
 
 //
@@ -46,7 +46,7 @@ func InsertTableEntry(tx *sql.Tx, tableName, columnNames, values string) (tableI
 	// 	return tableID, false
 	// }
 
-	tableID = utils.GetLastInsertedID(res)
+	tableID = mysql_db.GetLastInsertedID(res)
 
 	return tableID, true
 }

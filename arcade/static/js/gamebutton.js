@@ -61,19 +61,24 @@ function sendUserRequest( requestFormFields ) {
 
 let generalMessageSpan;
 let problemMessageSpan;
-function handleUserRequestResponse() {
+async function handleUserRequestResponse() {
     if (this.readyState == 4 && this.status == 200) {
 
         let response = userRequest.responseText;
         message = response.split("\n");
+
+        problemMessageSpan = document.querySelector("#problem_message_span");
+        generalMessageSpan = document.querySelector("#general_message_span");
+
         if (response.includes("PROBLEM:")) {
-            problemMessageSpan = document.querySelector("#problem_message_span");
             problemMessageSpan.innerHTML = message[1];
         } 
         else if (response.includes("MESSAGE:")) {
-            generalMessageSpan = document.querySelector("#general_message_span");
             generalMessageSpan.innerHTML = message[1];
         }
-            
+          
+        await timer(2000);
+        problemMessageSpan.innerHTML = "";
+        generalMessageSpan.innerHTML = "";
     }
 }

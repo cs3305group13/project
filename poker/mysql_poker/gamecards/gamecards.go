@@ -10,9 +10,8 @@ import (
 	"github.com/cs3305/group13_2022/project/utils"
 )
 
-// function appends the necessary cards to the 'community_cards' entry in 'poker_tables'
-// while refreshing this changed state in both 'deck' and 'cards_not_in_deck' in 'tables' table
-func AddToCommunityCards(DB *my_sql.DB, tablesTableName, pokerTablesTableName, tableId string, gameEndedEarly bool ) bool {
+
+func AddToCommunityCards(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string, gameEndedEarly bool) bool {
 	deck, cardsNotInDeck := getCards(DB, tablesTableName, tableID)
 
 	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
@@ -22,17 +21,20 @@ func AddToCommunityCards(DB *my_sql.DB, tablesTableName, pokerTablesTableName, t
 		for i:=0; i<3; i++ {
 			cardsToAdd += cards.TakeCard(deck, cardsNotInDeck)
 		}
+
 	} else if gameEndedEarly {
-		i := len(*communityCards) - 1 // -1 offset for correct index
+		i := len(*communityCards) - 1  // '-1' to offset for correct index
 		if i < 0 {
 			i = 0
 		}
+		
 		for i < 5 {
 			i += 1
-			cardsToadd += cards.TakeCard(deck, cardsNotInDeck)
+			cardsToAdd += cards.TakeCard(deck, cardsNotInDeck)
 		}
 		return false
-	} else if 5 > len(*communityCards) && len(*communityCards) >= 3 {
+
+	} else if 5 > len(*communityCards) && len(*communityCards) >= 3  {
 		cardsToAdd = cards.TakeCard(deck, cardsNotInDeck)
 
 	} else {
@@ -41,15 +43,15 @@ func AddToCommunityCards(DB *my_sql.DB, tablesTableName, pokerTablesTableName, t
 
     // reassign deckString with deck without taken card
 	deckString := cards.DeckString(deck)
-
+	
 	// reassign cardsNotInDeckString for the same purpose
 	cardsNotInDeckString := cards.DeckString(cardsNotInDeck)
 
-	refreshDeckAndCardsNotInDeck(DB, tablesTableName, deckString, cardsNotInDeckString, tableID )
+	refreshDeckAndCardsNotInDeck(DB, tablesTableName, deckString, cardsNotInDeckString, tableID)
+	
 	addCards(DB, pokerTablesTableName, tableID, cardsToAdd)
-
+	
 	return true
-
 }
 
 
@@ -135,7 +137,7 @@ func refreshDeckAndCardsNotInDeck(DB *mysql_db.DB, tablesTableName, deckString, 
 	res, err := db.Exec(query)
 	utils.CheckError(err)
 
-	if utils.GetNumberOfRowsAffected(res) > 1 {
+	if mysql_db.GetNumberOfRowsAffected(res) > 1 {
 		panic("Exactly one row should have been affected")
 	}
 
@@ -155,7 +157,7 @@ func addCards(DB *mysql_db.DB, pokerTablesTableName, tableID, cardsToAdd string)
     res, err := db.Exec(query)
 	utils.CheckError(err)
 
-	if utils.GetNumberOfRowsAffected(res) > 1 {
+	if mysql_db.GetNumberOfRowsAffected(res) > 1 {
 		panic("Exactly one row should have been affected")
 	}
 }

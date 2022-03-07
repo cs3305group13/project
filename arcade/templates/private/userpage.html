@@ -1,39 +1,64 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Protected Page</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+        <title>User Page</title>
+        <link rel="stylesheet" type="text/css" href="../static/css/main.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Jockey+One&display=swap" rel="stylesheet">
         <!-- <script src="/static/js/protected.js"></script> -->
     </head>
     <body>
-        <h1>Welcome to your page {{.Username}}!</h1>
+        <h1 class="row">♠♣♥♦ Poker Game ♦♥♣♠</h1>
+        <h2 class="usr">Welcome to your page {{.Username}}!</h2>
+        <div class="forms">
 
         <form action="" method="post">
             <fieldset>
 
-                <input type="submit" value="poker" name="submit">
+                <legend>Poker</legend>
 
                 <label for="table_code">Table Code:</label>
                 <input type="text" id="table_code" name="table_code" >
 
+                <input type="submit" value="poker" name="submit">
+                <img class="poker" src="../static/media/cardgames/pokerchips.png"
+                width="20%" height="15%"/>
+               <p class="instructions">Play a game of classic poker with friends,
+                using a unique code, jump right to the table and start playing.
+                Or join a random game and play with others
+              </p>
+
+            </fieldset>
+        </form>
+     
+        <form class="form" action="" method="post">
+            <fieldset>
+                <legend>Side Scroller</legend>
+                <img class="adventure" src="../static/media/cardgames/pixelguy.png"
+                  width="17%" height="12%" />
+                <input type="submit" value="royal runner" name="submit">
+                <p class="instructions">Earn virtual coins that can be used in
+                  the poker game through this adventure side scroller game
+                </p>
             </fieldset>
         </form>
 
-        <form action="" method="post">
-            <fieldset>
-                
-                <input type="submit" value="adventure_game" name="submit">
-
-            </fieldset>
-        </form>
-
-        <form action="" method="post">
+        <form class="form" action="" method="post">
             <fieldset>
 
+                <legend>Blackjack</legend>
                 <input type="submit" value="blackjack" name="submit">
-
+                <img class="blackjack" src="../static/media/cardgames/blackjack.png"
+                     width="20%" height="10%"/>
+                <p class="instructions">Beat the dealer's hand without going over 21. Both you and
+                  the dealer start with two cards, but one of the dealer's cards
+                is hidden till then end. If you go over 21 you bust, and the
+                  dealer wins regardless of their hand
+               </p>
             </fieldset>
         </form>
+      </div>
 
     </body>
 </html>

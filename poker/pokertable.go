@@ -1,133 +1,149 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Protected Page</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
-        <script src="/static/js/getcontent.js"></script>
-        <script src="/static/js/gamebuttons.js"></script>
-    </head>
-    <body>
+package poker
 
-        
-        <h1>Lobby Code: {{.TableID}}</h1>
-        <h1 hidden id="hidden_username_tag" >{{.Username}}</h1>
-        <h1 hidden id="hidden_seatnumber_tag" >{{.SeatNumber}}</h1>
-        <h1 hidden id="hidden_funds_tag">{{.Funds}}</h1>
+import (
+	"html"
+	"net/http"
+	"strconv"
+	"text/template"
 
-        <ul>
-            <li>
-                <span id="money_in_pot" ></span>
-            </li>
-            <li>
-                <span id="side_pot" ></span>
-            </li>
-            <li>
-                <span id="current_player_making_move" ></span>
-            </li>
-            <li>
-                <span id="community_cards"></span>
-            </li>
-        </ul>
+	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gamecreate"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gamejoin"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameobserver"
+	"github.com/cs3305/group13_2022/project/utils"
+	"github.com/cs3305/group13_2022/project/utils/env"
+	"github.com/cs3305/group13_2022/project/utils/token"
+)
 
-        
-        <ul id="player_list">
-            <li id="seat_1" >
-                <ul><li> Seat 1:</li>
-                    <li id="username_1"></li>
-                    <li id="funds_1"></li>
-                    <li id="state_1"></li>
-                    <li id="money_in_pot_1"></li>
-                    <li id="cards_1"></li>
-                </ul>
-            </li>
-            <li id="seat_2" >
-                <ul><li> Seat 2:</li>
-                    <li id="username_2"></li>
-                    <li id="funds_2"></li>
-                    <li id="state_2"></li>
-                    <li id="money_in_pot_2"></li>
-                    <li id="cards_2"></li>
-                </ul>
-            </li>
-            <li id="seat_3" >
-                <ul><li> Seat 3:</li>
-                    <li id="username_3"></li>
-                    <li id="funds_3"></li>
-                    <li id="state_3"></li>
-                    <li id="money_in_pot_3"></li>
-                    <li id="cards_3"></li>
-                </ul>
-            </li>
-            <li id="seat_4" >
-                <ul><li> Seat 4:</li>
-                    <li id="username_4"></li>
-                    <li id="funds_4"></li>
-                    <li id="state_4"></li>
-                    <li id="money_in_pot_4"></li>
-                    <li id="cards_4"></li>
-                </ul>
-            </li>
-            <li id="seat_5" >
-                <ul><li> Seat 5:</li>
-                    <li id="username_5"></li>
-                    <li id="funds_5"></li>
-                    <li id="state_5"></li>
-                    <li id="money_in_pot_5"></li>
-                    <li id="cards_5"></li>
-                </ul>
-            </li>
-            <li id="seat_6" >
-                <ul><li> Seat 6:</li>
-                    <li id="username_6"></li>
-                    <li id="funds_6"></li>
-                    <li id="state_6"></li>
-                    <li id="money_in_pot_6"></li>
-                    <li id="cards_6"></li>
-                </ul>
-            </li>
-            <li id="seat_7" >
-                <ul><li> Seat 7:</li>
-                    <li id="username_7"></li>
-                    <li id="funds_7"></li>
-                    <li id="state_7"></li>
-                    <li id="money_in_pot_7"></li>
-                    <li id="cards_7"></li>
-                </ul>
-            </li>
-            <li id="seat_8" >
-                <ul><li> Seat 8:</li>
-                    <li id="username_8"></li>
-                    <li id="funds_8"></li>
-                    <li id="state_8"></li>
-                    <li id="money_in_pot_8"></li>
-                    <li id="cards_8"></li>
-                </ul>
-            </li>
-        </ul>
+type details struct {
+	Username string
+	TableID string
+	SeatNumber string
+	Funds string
+}
 
-        <span id="general_message_span"></span>
-        <span id="problem_message_span"></span>
+func HandlePokerTableRequest( w http.ResponseWriter, r *http.Request ) {
+	if token.TokenValid( w, r, true ) {
+		var d details
+	    d.Username = token.GetUsername(r, "token")
+		d.TableID = token.GetTableID(r, "token")
+		d.SeatNumber = token.GetSeatNumber(r, "token")
+		d.Funds = token.GetFunds(r, "token")
+		
+	    attachPokerPage(w, d)
+	}
+}
 
-        <form id="player_state_button_form" >
-            <fieldset>
-                <input type="button" id="ready_button" value="Ready Up!" />
-            </fieldset>
-        </form>
+func HandlePokerForm( w http.ResponseWriter, r *http.Request ) (joinedGame bool) {
 
-        <form id="game_buttons_form" >
-            <fieldset>
-                <input type="button" id="fold_button" value="Fold" />
-                
-                <input type="button" id="check_button" value="Check" />
-                <input type="button" id="call_button" value="Call" />
+	r.ParseForm()
+	if len(r.Form) == 0 {
+		http.Redirect(w, r, "userpage", http.StatusMovedPermanently)
+		return false
+	}
 
-                <input type="button" id="raise_button" value="Raise" />
-                
-                <!-- value in label will alternate between Call and Raise depending on chips -->
-                <label for="amount" >Amount:</label>
-                <input type="text" id="amount" name="amount" />
-            </fieldset>
-        </form>
+	pokerOnlineTableCode := html.EscapeString(r.Form.Get("table_code"))  // table code input field
 
-    </body>
-</html>
+	tableCode, err := strconv.Atoi(pokerOnlineTableCode)
+	if err != nil {
+		tableCode = 0
+	}
+
+	envs := env.GetEnvironmentVariables("../../../production.env")
+	if tableCode == 0 {
+		joinedGame = createOnlinePoker(w, r, envs)
+	}
+	if tableCode > 0 {
+		joinedGame = joinOnlinePoker(w, r, envs, pokerOnlineTableCode)
+	}
+	return joinedGame
+}
+
+
+func createOnlinePoker( w http.ResponseWriter, r *http.Request, envs map[string]string ) (joinedGame bool) {
+	
+	username := token.GetUsername(r, "token")
+
+	DB := mysql_db.NewDB(envs)
+	playersTableName := envs["PLAYERS_TABLE"]
+	tablesTableName := envs["TABLES_TABLE"]
+	pokerTablesTableName := envs["POKER_TABLES_TABLE"]
+
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	tableID := gamecreate.AssignNewTable( tx, tablesTableName, pokerTablesTableName, username )
+
+	seatNumber, _ := gameinfo.GetNextAvailableSeat(DB, playersTableName, tableID)
+	
+	funds := gamejoin.UpdatePlayersSelectedGame(DB, tx, playersTableName, tableID, username, seatNumber)
+
+
+	claims, expirationTime := token.NewDefaultClaims(username, "poker", tableID, seatNumber, funds)
+	token.AppendTokenCookie(w, "token", claims, expirationTime)
+	
+	err := tx.Commit()
+	utils.CheckError(err)
+
+	go gameobserver.GameObserver(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+
+	return true
+	
+}
+
+func joinOnlinePoker( w http.ResponseWriter, r *http.Request, envs map[string]string, tableID string ) (joinedGame bool) {
+	
+	DB := mysql_db.NewDB(envs)
+	tablesTableName := envs["TABLES_TABLE"]
+	playersTableName := envs["PLAYERS_TABLE"]
+
+	db := mysql_db.EstablishConnection(DB)
+	tx := mysql_db.NewTransaction(db)
+	defer tx.Rollback()
+	defer db.Close()
+
+	if gamejoin.CheckTableExists(tx, tablesTableName, tableID) == false {
+		attachUserPage(w, "MESSAGE:\nSorry please make sure to specify a valid tableCode.")
+		return false
+	} else {
+		username := token.GetUsername(r, "token")
+
+		numberOfPlayersAtTable := gameinfo.GetNumberOfPlayersAtTable(DB, tablesTableName, tableID)
+
+		maxNumberOfPlayers, _ := strconv.Atoi(envs["MAX_NUMBER_OF_PLAYERS"])
+		if numberOfPlayersAtTable >= maxNumberOfPlayers {
+			attachUserPage(w, "Sorry this table is full.")
+			return false
+		} else {
+			seatNumber, seatFound := gameinfo.GetNextAvailableSeat(DB, playersTableName, tableID)
+			if seatFound == false {
+				attachUserPage(w, "Sorry this table is full.")
+			    return false
+			} else {
+				funds := gamejoin.UpdatePlayersSelectedGame( DB, tx, playersTableName, tableID, username, seatNumber )
+
+				claims, expirationTime := token.NewDefaultClaims(username, "poker", tableID, seatNumber, funds)
+				token.AppendTokenCookie(w, "token", claims, expirationTime)
+				
+				tx.Commit()
+				return true
+			}
+		}
+	}
+}
+
+
+func attachPokerPage( w http.ResponseWriter, d details ) {
+	var tpl *template.Template
+	tpl, _ = template.ParseGlob("templates/private/pokertable.html")
+	tpl.ExecuteTemplate(w, "pokertable.html", d)
+}
+
+func attachUserPage(w http.ResponseWriter, message string) {
+	var tpl *template.Template
+	tpl, _ = template.ParseGlob("templates/private/userpage.html")
+	tpl.ExecuteTemplate(w, "userpage.html", message)
+}
