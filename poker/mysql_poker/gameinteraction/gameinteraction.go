@@ -13,7 +13,7 @@ import (
 )
 
 // takes specified amount from the player, updates their money_in_pot entry and also adds it to the game pot
-func TryTakeMoneyFromPlayer(DB *mysql_db.DB, playersTableName, tableID, playerName, bid string) (taken bool) {
+func TryTakeMoneyFromPlayer(DB *mysql_db.DB, playersTableName, pokerTablesTableName, tableID, playerName, bid string) (taken bool) {
 	playersFunds := gameinfo.GetPlayersFunds(DB, playersTableName, playerName)
 	
 	playersBid, err := strconv.ParseFloat(bid, 64)
@@ -28,14 +28,15 @@ func TryTakeMoneyFromPlayer(DB *mysql_db.DB, playersTableName, tableID, playerNa
 	defer db.Close()
 
 	query := fmt.Sprintf(`UPDATE %s
-	                      SET funds = funds - %v
-						  money_in_pot = money_in_pot + %v
+	                      SET funds = funds - %v,
+						      money_in_pot = money_in_pot + %v
 						  WHERE username = "%s";`, playersTableName, playersBid, playersBid, playerName)
-	_, err := db.Exec(query)
+	
+	_, err = db.Exec(query)
 	utils.CheckError(err)
 
 	query = fmt.Sprintf(`UPDATE %s
-						 SET money_in_pot = money_in_pot + %v
+	                     SET money_in_pot = money_in_pot + %v
 						 WHERE table_id = %s;`, pokerTablesTableName, bid, tableID)
 
 	_, err = db.Exec(query)
@@ -90,7 +91,7 @@ func PlayerFolded(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTable
 		response, err := db.Exec(query)
 		utils.CheckError(err)
 
-		numberOfRows := utils.GetNumberOfRowsAffected(response)
+		numberOfRows := mysql_db.GetNumberOfRowsAffected(response)
 
 		if numberOfRows != 1 {
 			panic("One and only one row should have been changed with this operation.")
@@ -161,11 +162,7 @@ func PlayerTakesAction(DB *mysql_db.DB, tablesTableName, playersTableName, poker
 	}
 
 	
-<<<<<<< HEAD
 	successfullyTaken := TryTakeMoneyFromPlayer(DB, playersTableName, pokerTablesTableName, tableID, username, amount)
-=======
-	successfullyTaken := TryTakeMoneyFromPlayer(DB, tx, playersTableName, pokerTablesTableName, tableID, username, amount)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 
 	if ! successfullyTaken {
 		panic("Amount was not taken properly.")
@@ -175,15 +172,11 @@ func PlayerTakesAction(DB *mysql_db.DB, tablesTableName, playersTableName, poker
 }
 
 
-<<<<<<< HEAD
 func playerAllIn(DB *mysql_db.DB, playersTableName, username string) {
 
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
 
-=======
-func playerAllIn(tx *sql.Tx, playersTableName, username string) {
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 	query := fmt.Sprintf(`UPDATE %s
 	                      SET player_state = "ALL_IN"
 						  WHERE username = "%s"`, playersTableName, username)
@@ -201,7 +194,6 @@ func playerRaised( DB *mysql_db.DB, tablesTableName, playersTableName, pokerTabl
 	setOperation := fmt.Sprintf(`highest_bidder = "%s",
 	                             highest_bid = "%s"`, username, raiseAmount)
 
-<<<<<<< HEAD
 	gameflow.AssignThisPlayerToRole(DB, pokerTablesTableName, tableID, username, setOperation)
 
 	// (step 2.) set players state as "RAISED"
@@ -216,41 +208,20 @@ func playerRaised( DB *mysql_db.DB, tablesTableName, playersTableName, pokerTabl
 	if err != sql.ErrNoRows {
 		utils.CheckError(err)
 	}
-=======
-	gameflow.AssignThisPlayerToRole(tx, pokerTablesTableName, tableID, username, setOperation)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
-
-	query := fmt.Sprintf(`UPDATE %s
-	                      SET player_state = "RAISED"
-						  WHERE username = "%s";`, playersTableName, username)
-
-	_, err := tx.Exec(query)
-	if err != sql.ErrNoRows {
-		utils.CheckError(err)
-	}
 
 	return true
 }
 
-<<<<<<< HEAD
 func playerCalled( DB *mysql_db.DB, playersTableName, username string ) bool {
 
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
 
-=======
-func playerCalled( tx *sql.Tx, playersTableName, username string ) bool {
-
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 	query := fmt.Sprintf(`UPDATE %s
 	                      SET player_state = "CALLED"
 						  WHERE username = "%s";`, playersTableName, username)
 
-<<<<<<< HEAD
 	_, err := db.Exec(query)
-=======
-	_, err := tx.Exec(query)
->>>>>>> ecc4f5f74a4a414e36a17abc4e3f6d391559f80c
 	if err != sql.ErrNoRows {
 		utils.CheckError(err)
 	}

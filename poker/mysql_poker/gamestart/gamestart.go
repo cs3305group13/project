@@ -34,13 +34,15 @@ func TryReadyUpPlayer(w http.ResponseWriter, r *http.Request, DB *mysql_db.DB, t
 		tableID := token.GetTableID(r, "token")
 		username := token.GetUsername(r, "token")
 
-		canBegin := readyUpPlayer(w, DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
+		begin := readyUpPlayer(w, DB, tx, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
 		err := tx.Commit()
-		utils.CheckError(err)
 
-		if canBegin {
+		if begin {
 			beginGame(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 		}
+		utils.CheckError(err)
+		
+		return
 	}
 }
 
@@ -57,7 +59,7 @@ func readyUpPlayer(w http.ResponseWriter, DB *mysql_db.DB, tx *sql.Tx, tablesTab
 	return beginGame
 }
 func checkIfGameShouldStart(w http.ResponseWriter, DB *mysql_db.DB, tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) (beginGame bool) {
-	
+
 	query := fmt.Sprintf(`SELECT COUNT(*)
 	                      FROM %s
 						  WHERE player_state = "READY" AND table_id = "%s"`, playersTableName, tableID)
@@ -75,25 +77,20 @@ func checkIfGameShouldStart(w http.ResponseWriter, DB *mysql_db.DB, tx *sql.Tx, 
 	utils.CheckError(err)
 
 	if totalNumberOfPlayersAtTable > 1 && numberOfReadyPlayersAtTable == totalNumberOfPlayersAtTable {
-		
-		initGame(tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
+		startGame(tx, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 		beginGame = true
 		return beginGame
-
 	} else if totalNumberOfPlayersAtTable == 1 {
-		
 		w.Write([]byte("PROBLEM:\nTo start at least two players need to be present."))
 		beginGame = false
 		return beginGame
-
 	} else {
-
 		w.Write([]byte("MESSAGE:\nSome players are not ready yet."))
 		beginGame = false
 		return beginGame
 	}
 }
-func initGame(tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) (beginGame bool) {
+func startGame(tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableName, tableID string) (beginGame bool) {
 
 	deck := cards.NewDeck(1)
 	cards.Shuffle(deck)
@@ -111,7 +108,7 @@ func initGame(tx *sql.Tx, tablesTableName, playersTableName, pokerTablesTableNam
 
 	query = fmt.Sprintf(`UPDATE %s
 	                     SET player_state = "PLAYING",
-						 	 money_in_pot = "0.0"
+						     money_in_pot = "0.0"
 						 WHERE player_state = "READY" AND table_id = %s;`, playersTableName, tableID)
 
 	_, err = tx.Exec(query)
@@ -124,21 +121,21 @@ func beginGame(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTa
 	
 	smallBlind, bigBlind, newCurrentPlayerMakingMove := findWhoShouldBeSmallAndBigBlind(DB, playersTableName, tableID, currentPlayerMakingMove, seatNumber)
 
-	// here we are relying that gameReset set money_in_pot to zero.
 	smallBlindAmount := "1.0"
 	bigBlindAmount := "2.0"
-	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, tableID, smallBlind, smallBlindAmount)
-	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, tableID, bigBlind, bigBlindAmount)
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, pokerTablesTableName, tableID, smallBlind, smallBlindAmount)
+	_ = gameinteraction.TryTakeMoneyFromPlayer(DB, playersTableName, pokerTablesTableName, tableID, bigBlind, bigBlindAmount)
 
 	db := mysql_db.EstablishConnection(DB)
 	defer db.Close()
 
 	// initialize the big blind as the highest bidder
 	query := fmt.Sprintf(`UPDATE %s
-						  SET community_cards = " ",
-							  highest_bidder = "%s",
-						  	  highest_bid = "%s",
-						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, tableID)
+						  SET community_cards = "",
+						      highest_bidder = "%s",
+						      highest_bid = "%s",
+							  money_in_pot = 0.0
+						  WHERE table_id = %s;`, pokerTablesTableName, bigBlind, bigBlindAmount, tableID)
 
 	_, err := db.Exec(query)  // result is ignored because TryTakeMoneyFromPlayers updates highestBidder
 	utils.CheckError(err)
@@ -150,10 +147,11 @@ func beginGame(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTa
 
 	res, err := db.Exec(query)
 	utils.CheckError(err)
-	if utils.GetNumberOfRowsAffected(res) > 1 {
+	if mysql_db.GetNumberOfRowsAffected(res) > 1 {
 		panic("Exactly one row should have been affected here.")
 	}
-	gamecards.GivePlayersTheirCards(DB, tablesTableName, tableID)
+
+	gamecards.GivePlayersTheirCards(DB, tablesTableName, playersTableName, tableID)
 }
 
 
