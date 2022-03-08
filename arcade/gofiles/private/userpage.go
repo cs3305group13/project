@@ -1,6 +1,7 @@
 package private
 
 import (
+	"fmt"
 	"html"
 	"html/template"
 	"net/http"
@@ -30,17 +31,20 @@ func checkForm( w http.ResponseWriter, r *http.Request ) {
 	} else {
 		submitValue := html.EscapeString(r.FormValue("submit"))
 		switch submitValue {
-		case "poker" :
+		case "Poker" :
             gameSetup := poker.HandlePokerForm(w, r)
 			if gameSetup {
 				http.Redirect(w, r, "pokertable", http.StatusMovedPermanently)
 			}
 
-		case "royal runner" :
+		case "Royal Runner" :
 			http.Redirect(w, r, "adventure_game", http.StatusMovedPermanently)
 
-	    case "blackjack" :
+	    case "Blackjack" :
 			http.Redirect(w, r, "blackjack", http.StatusMovedPermanently)
+
+	    default :
+		    fmt.Printf("Problem; Couldn't match users choice '%s' with any option", submitValue)
 		}
 	}
 }
