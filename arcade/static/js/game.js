@@ -1,12 +1,17 @@
 let suits = ["s", "h", "d", "c"];
 let facevalues = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k", "a"];
 let deck = new Array();
+let dealerCards = new Array();
+let dealerScore = new Array();
+let playerCards = new Array();
+let playerScore = new Array();
 
 function startGame() {
     createDeck();
     shuffle();
     players();
-    randomCard();
+    // randomCard();
+    dealHands();
 }
 
 function getRandomInt(min, max) {
@@ -65,17 +70,16 @@ function players() {
     }
 }
 
-function randomCard() {
-    let randIndex = Math.floor(deck.length * Math.random());
-    console.log( deck[randIndex])
-}
 
-function deal() {
-    let hand_div = document.createElement('div');
-    let points_div = document.createElement('div');
-    points_div.className = "points";
-    hand_div.id = "hand";
-    let playerHand = []
-    let dealerHand = [];
-}
+
+// function deal() {
+//     let hand_div = document.createElement('div');
+//     let points_div = document.createElement('div');
+//     points_div.className = "points";
+//     hand_div.id = "hand";
+//     let playerHand = [randomCard(deck), randomCard(deck)]
+//     let dealerHand = [randomCard(deck), randomCard(deck)];
+//     console.log(playerHand)
+//     console.log(dealerHand)
+// }
     
