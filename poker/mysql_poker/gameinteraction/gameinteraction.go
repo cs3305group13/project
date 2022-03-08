@@ -156,6 +156,8 @@ func PlayerTakesAction(DB *mysql_db.DB, tablesTableName, playersTableName, poker
 		action = "CALLED"
 
 	} else if playersMoneyInPot >= highestBid*2 {
+		amount = fmt.Sprintf(`%f`, playersMoneyInPot)
+
 		playerRaised(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username, seatNumber, amount)
 		action = "RAISED"
 

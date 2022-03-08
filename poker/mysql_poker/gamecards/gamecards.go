@@ -32,7 +32,6 @@ func AddToCommunityCards(DB *mysql_db.DB, tablesTableName, playersTableName, pok
 			i += 1
 			cardsToAdd += cards.TakeCard(deck, cardsNotInDeck)
 		}
-		return false
 
 	} else if 5 > len(*communityCards) && len(*communityCards) >= 3  {
 		cardsToAdd = cards.TakeCard(deck, cardsNotInDeck)
