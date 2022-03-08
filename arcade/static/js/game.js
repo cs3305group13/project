@@ -24,7 +24,7 @@ function startGame() {
     shuffle(shuffleTimes);
     players();
     // randomCard();
-    dealHands();
+    deal();
 }
 
 function getRandomInt(min, max) {
@@ -85,16 +85,11 @@ function players() {
     }
 }
 
+function deal() {
+    playerCards = [nextCard(), nextCard()]
+    dealerCards = [nextCard(), nextCard()]
+}
 
-
-// function deal() {
-//     let hand_div = document.createElement('div');
-//     let points_div = document.createElement('div');
-//     points_div.className = "points";
-//     hand_div.id = "hand";
-//     let playerHand = [randomCard(deck), randomCard(deck)]
-//     let dealerHand = [randomCard(deck), randomCard(deck)];
-//     console.log(playerHand)
-//     console.log(dealerHand)
-// }
-    
+function nextCard() {
+    return deck.shift();
+}
