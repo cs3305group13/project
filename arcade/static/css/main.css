@@ -33,8 +33,12 @@ body {
       background-color: lightgrey;
   }
 
-  .login, h2 span, p span .form {
+  h2 span, p span {
     background-color: white;
+  }
+
+  .login {
+    background-color: lightgray;
   }
   
   form {
@@ -54,7 +58,6 @@ body {
   
   .instructions {
     font-size: 13px;
-    background-color: white;
   }
   .blackjack, .poker, .adventure {
     float: right;
@@ -112,10 +115,14 @@ body {
   }
   
   .table {
-    background-color:#22823f;
+    background-color:#008447;
     text-align: center;
   }
 
   #flipimg {
     transform: scaleX(-1);
+  }
+
+  .items {
+    list-style-type: none;
   }
