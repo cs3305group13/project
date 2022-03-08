@@ -33,8 +33,12 @@ body {
       background-color: lightgrey;
   }
 
-  .login, h2 span, p span {
+  h2 span, p span {
     background-color: white;
+  }
+
+  .login {
+    background-color: lightgray;
   }
   
   form {
