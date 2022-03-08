@@ -6,6 +6,7 @@ import (
 
 	"github.com/cs3305/group13_2022/project/cards"
 	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gamecards"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameflow"
 	"github.com/cs3305/group13_2022/project/poker/mysql_poker/gameinfo"
 	"github.com/cs3305/group13_2022/project/utils"
@@ -54,8 +55,12 @@ func ShowDown(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTab
 
 
 func getEndOfGameCommunityCards(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) []poker.Card {
-	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
+	for len( *gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID) ) != 5 {
+		gameEndedEarly := true
+		gamecards.AddToCommunityCards(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, gameEndedEarly)
+	}
 
+	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
 
 	// translate community cards to match chehsunliu implementation
 	var pokerCommunityCards []poker.Card
@@ -96,7 +101,6 @@ func SetWinner(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTa
 
 	resetGameState(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID)
 }
-
 
 
 // method called if game state is to be reset .ie game ended
