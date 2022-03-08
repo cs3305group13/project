@@ -8,7 +8,6 @@ let dealerCards = new Array();
 let dealerScore = 0;
 let playerCards = new Array();
 let playerScore = 0;
-
 function init() {
 
     // find by id #btnStart button and attach it an event listener
@@ -17,11 +16,9 @@ function init() {
     btnHit.addEventListener( "click", Hit, false );
     btnStand.addEventListener( "click", Stand, false );
 }
-
 function startGame() {  
     createDeck();
-    shuffle();
-    players();
+    shuffle(); 
     deal();
 }
 
@@ -58,19 +55,11 @@ function shuffle() {
 playersList = new Array();
 
 
-function players() {
-    let player1 =  document.getElementById('user1').value;
-    if( player1 != "") {
-        playersList.push(player1);
-    console.log("User 1: " + player1);
-    }
-}
-
 function deal() {
     playerCards = [nextCard(), nextCard()]
     dealerCards = [nextCard()]
     Score();
-    // console.log(playerCards)
+
 }
 
 function nextCard() {
@@ -78,6 +67,7 @@ function nextCard() {
 }
 
 function Hit() {
+    playerScore = 0;
     playerCards.push(deck.shift());
     Score();
 }
@@ -89,26 +79,31 @@ function Stand() {
 } 
 
 function Score() {
+    playerScore = 0;
     for(i = 0; i < playerCards.length; i ++) {
         playerScore += playerCards[i].Weight;
         console.log(playerCards);
-        console.log(playerScore);
+        console.log("Player Score: " + playerScore);
     }
 
+    dealerScore = 0;
     for(i = 0; i < dealerCards.length; i ++) {
         dealerScore += dealerCards[i].Weight;
         console.log(dealerCards);
-        console.log(dealerScore);
+        console.log("Dealer Score: " + dealerScore);
     }
-
-
+    
     if (playerScore > 21) {
         for (i = 0; i < playerCards.length; i ++) {
             if (playerCards[i].Value == "a" && playerCards[i].Weight == 11) {
                 playerCards[i].Weight == 1;
+                playerScore += 1
             } else {
             console.log("Dealer wins!")
             }
         }
-    }
+    }else if (dealerScore > 21) {
+        console.log("Player wins")
+    } else if (playerScore == dealerScore) 
+        console.log("Tie!") 
 }
