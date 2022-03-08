@@ -59,16 +59,7 @@ func removeIdleUsers(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTa
 							  player_cards = "",
 							  money_in_pot = 0.0
 						  WHERE table_id = %s AND time_since_request < DATE_SUB(NOW(), INTERVAL %s SECOND);`, playersTableName, tableID, fiveSeconds)
-	res, err := db.Exec(query)
-
-	if err != sql.ErrNoRows {
-	    utils.CheckError(err)
-	}
-
-	numberOfUsersRemoved := mysql_db.GetNumberOfRowsAffected(res)
-	if numberOfUsersRemoved > 0 {
-		fmt.Printf("%v user(s) were removed\n", numberOfUsersRemoved)
-	}
+	db.Exec(query)
 }
 
 func findIdleImportantUser(DB *mysql_db.DB, playersTableName, tableID, fiveSeconds, usernameAtRole string) (username string) {
