@@ -50,8 +50,9 @@ function createDeck() {
 function shuffle(timesShufflfed) {
     for(let i = 0; i < timesShufflfed; i++) {
         let rndNo = getRandomInt(1,52);
-        let card = deck[i]
-        deck[i] = card[rndNo];
+        let card = deck[i];
+
+        deck[i] = deck[rndNo];
         deck[rndNo] = card;
     }
 }
