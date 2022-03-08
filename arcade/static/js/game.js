@@ -1,3 +1,6 @@
+// Waits for html and css to load before executing startGame()
+window.addEventListener('DOMContentLoaded', init, false);
+
 let suits = ["s", "h", "d", "c"];
 let facevalues = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k", "a"];
 let deck = new Array();
@@ -6,9 +9,19 @@ let dealerScore = new Array();
 let playerCards = new Array();
 let playerScore = new Array();
 
+function init() {
+
+    // find by id #btnStart button and attach it an event listener
+    let btnStart = document.querySelector("#btnStart");
+    btnStart.addEventListener( "click", startGame, false );
+
+}
+
 function startGame() {
     createDeck();
-    shuffle();
+
+    let shuffleTimes = 52;
+    shuffle(shuffleTimes);
     players();
     // randomCard();
     dealHands();
@@ -19,7 +32,8 @@ function getRandomInt(min, max) {
 }
 
 function createDeck() {
-    deck = new Array();
+    deck = new Array(); // reset deck
+
     for (let i = 0; i < facevalues.length; i++) {
         for (let x = 0; x < suits.length; x++) {
             let weight = parseInt(facevalues[i]);
