@@ -33,7 +33,7 @@ body {
       background-color: lightgrey;
   }
 
-  .login, h2 span, p span .form {
+  .login, h2 span, p span {
     background-color: white;
   }
   
@@ -54,7 +54,6 @@ body {
   
   .instructions {
     font-size: 13px;
-    background-color: white;
   }
   .blackjack, .poker, .adventure {
     float: right;
