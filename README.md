@@ -23,8 +23,8 @@ These are discussed in more detail in later sections
 - **poker** *package*:
   * User request handling & game logic
   
-- **sidescroller** *package*:
-  * User request handling & game logic
+- **sidescroller && blackjack** *package*:
+  * User request handling
   
 - **mysql_db** *package*:
   * Establishes database connections for sql queries
