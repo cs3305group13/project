@@ -14,16 +14,14 @@ function init() {
     // find by id #btnStart button and attach it an event listener
     let btnStart = document.querySelector("#btnStart");
     btnStart.addEventListener( "click", startGame, false );
-
+    btnHit.addEventListener( "click", Hit, false );
+    btnStand.addEventListener( "click", Stand, false );
 }
 
-function startGame() {
+function startGame() {  
     createDeck();
-
-    let shuffleTimes = 52;
-    shuffle(shuffleTimes);
+    shuffle();
     players();
-    // randomCard();
     deal();
 }
 
@@ -47,35 +45,19 @@ function createDeck() {
     }
 }
 
-function shuffle(timesShufflfed) {
-    for(let i = 0; i < timesShufflfed; i++) {
+function shuffle() {
+    for(let i = 0; i < 52; i++) {
         let rndNo = getRandomInt(1,52);
         let card = deck[i];
 
         deck[i] = deck[rndNo];
         deck[rndNo] = card;
     }
+    console.log(deck)
 }
-
 
 playersList = new Array();
 
-// function players() {
-//     let player1 =  document.getElementById('user1').value;
-//     let player2 =  document.getElementById('user2').value;
-//     let player3 =  document.getElementById('user3').value;
-//     let player4 =  document.getElementById('user4').value;
-//     if( player1 != "" || player2 != "" || player3 != "" || player4 != "") {
-//         playersList.push(player1)
-//         playersList.push(player2)
-//         playersList.push(player3)
-//         playersList.push(player4)
-//     }
-//     console.log("User 1: " + player1)
-//     console.log("User 2: " + player2)
-//     console.log("User 3: " + player3)
-//     console.log("User 4: " + player4)
-// }
 
 function players() {
     let player1 =  document.getElementById('user1').value;
@@ -92,4 +74,12 @@ function deal() {
 
 function nextCard() {
     return deck.shift();
+}
+
+function Hit() {
+
+}
+
+function Stand() {
+
 }
