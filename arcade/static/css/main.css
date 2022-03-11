@@ -126,3 +126,16 @@ body {
   .items {
     list-style-type: none;
   }
+
+
+#poker_rules {
+    display: block;
+    text-align: center;
+    /* background-color: lightgray; */
+
+    list-style-type: none;
+}
+
+#poker_hand_rankings_chart_img {
+    border: solid black .1em;
+}
