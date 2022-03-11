@@ -7,6 +7,19 @@ import (
 	"github.com/cs3305/group13_2022/project/utils"
 )
 
+// Deletes all entries in users_credentials table for running tests
+func RefreshUsersCredentails( DB *mysql_db.DB ) {
+	db := mysql_db.EstablishConnection(DB)
+	defer db.Close()
+
+	// delete old contents
+	query := `DELETE FROM dummy_user_credentials;`
+
+	_, err := db.Exec(query)
+	utils.CheckError(err)
+}
+
+
 // Deletes all entries in players table and re-inserts
 // players necessary for running tests
 func RefreshPlayerTable( DB *mysql_db.DB ) {
