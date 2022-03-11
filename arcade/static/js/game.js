@@ -1,4 +1,4 @@
-// Waits for html and css to load before executing startGame()
+// Waits for html and css to load before executing init()
 window.addEventListener('DOMContentLoaded', init, false);
 
 let suits = ["s", "h", "d", "c"];
