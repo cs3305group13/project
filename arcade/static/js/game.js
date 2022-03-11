@@ -51,7 +51,7 @@ function shuffle() {
     for(let i = 0; i < 52; i++) {
         let rndNo = getRandomInt(1,52);
         let card = deck[i];
-
+        
         deck[i] = deck[rndNo];
         deck[rndNo] = card;
     }
