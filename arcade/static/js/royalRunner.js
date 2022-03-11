@@ -109,7 +109,7 @@
     let platformImage = createImage("../media/sideScrollerAssets/platform.png");
     let backgroundImage = createImage("../media/sideScrollerAssets/background.png");
     let hillImage = createImage("../media/sideScrollerAssets/hills.png");
-    let diamondImage = createImage("../media/sideScrollerAssets/diamond.png");
+    //let diamondImage = createImage("../media/sideScrollerAssets/diamond.png");
 
 
     let player = new Player(standRightImage, standLeftImage, runRightImage, runLeftImage);
@@ -131,8 +131,8 @@
     ];
 
     let genericObjects = [new GenericObject({x: 0, y: 0, image: backgroundImage}),
-                            new GenericObject({x: 0, y: 0, image: hillImage}),
-        new GenericObject({x: (580 * 5) + 1400, y: 150, image: diamondImage})];
+                            new GenericObject({x: 0, y: 0, image: hillImage})
+        /*new GenericObject({x: (580 * 5) + 1400, y: 150, image: diamondImage})*/];
 
     let keys = {
         right: {
@@ -155,7 +155,7 @@
         platformImage = createImage("../media/sideScrollerAssets/platform.png");
         backgroundImage = createImage("../media/sideScrollerAssets/background.png");
         hillImage = createImage("../media/sideScrollerAssets/hills.png");
-        diamondImage = createImage("../media/sideScrollerAssets/diamond.png");
+        //diamondImage = createImage("../media/sideScrollerAssets/diamond.png");
 
         player = new Player(standRightImage, standLeftImage, runRightImage, runLeftImage);
 
