@@ -134,6 +134,13 @@ func PlayerTakesAction(DB *mysql_db.DB, tablesTableName, playersTableName, poker
 		playerAllIn(DB, playersTableName, username)
 		action = "ALL_IN"
 
+		if playersFunds >= highestBid*2 {
+			setOperation := fmt.Sprintf(`highest_bidder = "%s",
+	                                     highest_bid = "%s"`, username, amount)
+
+	        gameflow.AssignThisPlayerToRole(DB, pokerTablesTableName, tableID, username, setOperation)
+		}
+
 	} else if highestBid == 0.0 && playersMoneyInPot == 0.0 {
 		playerChecked(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, username)
 		action = "CHECKED"
