@@ -22,7 +22,7 @@ func TestAddCards(t *testing.T) {
 	mysql_poker.RefreshPokerTable(DB)
 
 	tableID := "1"
-	cardsToAdd := "2HTCAH"
+	cardsToAdd := "2hTcAh"
 
 	addCards(DB, testingPokerTableName, tableID, cardsToAdd)
 }
@@ -31,7 +31,7 @@ func TestRefreshDeckAndCardsNotInDeck(t *testing.T) {
 
 	mysql_poker.RefreshTablesTable(DB)
 
-	deckString := "AH2H3H4H5H6H7H8H9HTHJHQHKHAD2D3D4D5D6D7D8D9DTDJDQDKDAS2S3S4S5S6S7S8S9STSJSQSKSAC2C3C4C5C6C7C8C9CTCJCQCKC"
+	deckString := "Ah2h3h4h5h6h7h8h9hThJhQhKhAd2d3d4d5d6d7d8d9dTdJdQdKdAs2s3s4s5s6s7s8s9sTsJsQsKsAc2c3c4c5c6c7c8c9cTcJcQcKc"
 	cardsNotInDeckString := ""
 	tableID := "1"
 

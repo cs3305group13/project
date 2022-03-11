@@ -23,14 +23,14 @@ func AddToCommunityCards(DB *mysql_db.DB, tablesTableName, playersTableName, pok
 		}
 
 	} else if gameEndedEarly {
-		i := len(*communityCards) - 1  // '-1' to offset for correct index
-		if i < 0 {
-			i = 0
-		}
-		
-		for i < 5 {
-			i += 1
-			cardsToAdd += cards.TakeCard(deck, cardsNotInDeck)
+		if len(*communityCards) < 5 {
+			i := len(*communityCards)
+
+			for i < 5 {
+				fmt.Println(i)
+				i += 1
+				cardsToAdd += cards.TakeCard(deck, cardsNotInDeck)
+			}
 		}
 
 	} else if 5 > len(*communityCards) && len(*communityCards) >= 3  {

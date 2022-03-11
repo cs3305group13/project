@@ -1,0 +1,16 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: darkgray;
+}
+
+canvas {
+    border: solid 1px white;
+    background-color: black;
+}
+
+h1 {
+    color: white;
+}

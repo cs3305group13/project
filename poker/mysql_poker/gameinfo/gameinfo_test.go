@@ -143,12 +143,9 @@ func TestGetCurrentPlayerMakingMove(t *testing.T) {
 func TestGetHighestBidder(t *testing.T) {
 	tableID := "1"
 	
-	bidder, bid := GetHighestBidder(DB, testingPokerTableName, tableID)
+	bidder, _ := GetHighestBidder(DB, testingPokerTableName, tableID)
 
 	if bidder == "" {
-		t.Error("bidders name could not be retrieved")
-	}
-	if bid == 0 {
 		t.Error("bidders name could not be retrieved")
 	}
 }

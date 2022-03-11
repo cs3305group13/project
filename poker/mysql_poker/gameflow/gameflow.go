@@ -17,15 +17,7 @@ func UpdateUsersTimeSinceRequest(DB *mysql_db.DB, tablesTableName, playersTableN
 	query := fmt.Sprintf(`UPDATE %s
 	                      SET time_since_request = CURRENT_TIMESTAMP()
 						  WHERE username = "%s";`, playersTableName, username)
-	res, err := db.Exec(query)
-	utils.CheckError(err)
-
-	numberOfRowsAffected := mysql_db.GetNumberOfRowsAffected(res)
-	if numberOfRowsAffected > 1 {
-		fmt.Println(numberOfRowsAffected)
-		panic("Exactly one row should have been affected.")
-	}
-	
+	db.Exec(query)
 }
 
 // Method used to update next player who holds the responsibility.

@@ -55,12 +55,14 @@ func ShowDown(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTab
 
 
 func getEndOfGameCommunityCards(DB *mysql_db.DB, tablesTableName, playersTableName, pokerTablesTableName, tableID string) []poker.Card {
-	for len( *gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID) ) != 5 {
+	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
+	for len( *communityCards ) < 5 {
+
 		gameEndedEarly := true
 		gamecards.AddToCommunityCards(DB, tablesTableName, playersTableName, pokerTablesTableName, tableID, gameEndedEarly)
-	}
 
-	communityCards := gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
+		communityCards = gameinfo.GetCommunityCards(DB, pokerTablesTableName, tableID)
+	}
 
 	// translate community cards to match chehsunliu implementation
 	var pokerCommunityCards []poker.Card
