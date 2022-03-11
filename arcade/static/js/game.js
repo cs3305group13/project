@@ -54,12 +54,10 @@ function shuffle() {
 
 playersList = new Array();
 
-
 function deal() {
     playerCards = [nextCard(), nextCard()]
     dealerCards = [nextCard()]
     Score();
-
 }
 
 function nextCard() {
@@ -73,7 +71,7 @@ function Hit() {
 }
 
 function Stand() {
-    if (dealerScore < 17)
+    if (dealerScore < 21)
         dealerCards.push(deck.shift());
         Score();
 } 
@@ -99,11 +97,16 @@ function Score() {
                 playerCards[i].Weight == 1;
                 playerScore += 1
             } else {
-            console.log("Dealer wins!")
+                console.log("Dealer wins!")
             }
         }
-    }else if (dealerScore > 21) {
+    } if (dealerScore > 21) {
         console.log("Player wins")
-    } else if (playerScore == dealerScore) 
-        console.log("Tie!") 
+    } if (playerScore == dealerScore) {
+        console.log("Tie!")
+    } if (dealerScore == 21 && playerScore != 21) {
+        console.log("Dealer wins")
+    } if (playerScore == 21 && dealerScore != 21) {
+        console.log("Player wins")
+}
 }
