@@ -12,6 +12,27 @@ function main () {
 
     const gravity = 0.5;
 
+    let standRightImage = document.images.item(9);
+    let standLeftImage = document.images.item(8);
+    let runRightImage = document.images.item(7);
+    let runLeftImage = document.images.item(6);
+
+    let platformImage = document.images.item(4);
+    let backgroundImage = document.images.item(0);
+    let hillImage = document.images.item(3);
+    let diamondImage = document.images.item(1);
+
+
+    //let standRightImage = createImage("../media/sideScrollerAssets/spriteStandRight.png");
+    //let standLeftImage = createImage("../media/sideScrollerAssets/spriteStandLeft.png");
+    //let runRightImage = createImage("../media/sideScrollerAssets/spriteRunRight.png");
+    //let runLeftImage = createImage("../media/sideScrollerAssets/spriteRunLeft.png");
+
+    //let platformImage = createImage("../media/sideScrollerAssets/platform.png");
+    //let backgroundImage = createImage("../media/sideScrollerAssets/background.png");
+    //let hillImage = createImage("../media/sideScrollerAssets/hills.png");
+    //let diamondImage = createImage("../media/sideScrollerAssets/diamond.png");
+
     class Player {
         constructor(standRight, standLeft, runRight, runLeft) {
             this.speed = 10;
@@ -102,15 +123,17 @@ function main () {
         return image;
     }
 
-    let standRightImage = createImage("../media/sideScrollerAssets/spriteStandRight.png");
-    let standLeftImage = createImage("../media/sideScrollerAssets/spriteStandLeft.png");
-    let runRightImage = createImage("../media/sideScrollerAssets/spriteRunRight.png");
-    let runLeftImage = createImage("../media/sideScrollerAssets/spriteRunLeft.png");
+    //let standRightImage = createImage("../media/sideScrollerAssets/spriteStandRight.png");
+    //let standLeftImage = createImage("../media/sideScrollerAssets/spriteStandLeft.png");
+    //let runRightImage = createImage("../media/sideScrollerAssets/spriteRunRight.png");
+    //let runLeftImage = createImage("../media/sideScrollerAssets/spriteRunLeft.png");
 
-    let platformImage = createImage("../media/sideScrollerAssets/platform.png");
-    let backgroundImage = createImage("../media/sideScrollerAssets/background.png");
-    let hillImage = createImage("../media/sideScrollerAssets/hills.png");
+    //let platformImage = createImage("../media/sideScrollerAssets/platform.png");
+    //let backgroundImage = createImage("../media/sideScrollerAssets/background.png");
+    //let hillImage = createImage("../media/sideScrollerAssets/hills.png");
     //let diamondImage = createImage("../media/sideScrollerAssets/diamond.png");
+
+
 
 
     let player = new Player(standRightImage, standLeftImage, runRightImage, runLeftImage);
@@ -147,15 +170,25 @@ function main () {
     let scrollOffset = 0;
     
     function init() {
-        standRightImage = createImage("../media/sideScrollerAssets/spriteStandRight.png");
-        standLeftImage = createImage("../media/sideScrollerAssets/spriteStandLeft.png");
-        runRightImage = createImage("../media/sideScrollerAssets/spriteRunRight.png");
-        runLeftImage = createImage("../media/sideScrollerAssets/spriteRunLeft.png");
+        let standRightImage = document.images.item(9);
+        let standLeftImage = document.images.item(8);
+        let runRightImage = document.images.item(7);
+        let runLeftImage = document.images.item(6);
+    
+        let platformImage = document.images.item(4);
+        let backgroundImage = document.images.item(0);
+        let hillImage = document.images.item(3);
+        let diamondImage = document.images.item(1);
+        
+        //standRightImage = createImage("../media/sideScrollerAssets/spriteStandRight.png");
+        //standLeftImage = createImage("../media/sideScrollerAssets/spriteStandLeft.png");
+        //runRightImage = createImage("../media/sideScrollerAssets/spriteRunRight.png");
+        //runLeftImage = createImage("../media/sideScrollerAssets/spriteRunLeft.png");
 
-        standRightImage = createImage("../media/sideScrollerAssets/spriteStandRight.png");
-        platformImage = createImage("../media/sideScrollerAssets/platform.png");
-        backgroundImage = createImage("../media/sideScrollerAssets/background.png");
-        hillImage = createImage("../media/sideScrollerAssets/hills.png");
+        //standRightImage = createImage("../media/sideScrollerAssets/spriteStandRight.png");
+        //platformImage = createImage("../media/sideScrollerAssets/platform.png");
+        //backgroundImage = createImage("../media/sideScrollerAssets/background.png");
+        //hillImage = createImage("../media/sideScrollerAssets/hills.png");
         //diamondImage = createImage("../media/sideScrollerAssets/diamond.png");
 
         player = new Player(standRightImage, standLeftImage, runRightImage, runLeftImage);
