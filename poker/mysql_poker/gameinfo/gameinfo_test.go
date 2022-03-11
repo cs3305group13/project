@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cs3305/group13_2022/project/mysql_db"
+	"github.com/cs3305/group13_2022/project/testing/mysql_poker"
 	"github.com/cs3305/group13_2022/project/utils/env"
 )
 
@@ -20,6 +21,8 @@ var testingPokerTableName = envs["TESTING_POKER_TABLES_TABLE"]
 
 
 func TestGameInProgress(t *testing.T) {
+
+	mysql_poker.RefreshTablesTable(DB)
 	
 	tableID := "1"
 	
@@ -31,6 +34,8 @@ func TestGameInProgress(t *testing.T) {
 }
 
 func TestGetNumberOfPlayersAtTable(t *testing.T) {
+
+	mysql_poker.RefreshPlayerTable(DB)
 	
 	tableID := "1"
 
@@ -54,6 +59,8 @@ func TestGetNumberOfPlayersAllIn(t *testing.T) {
 
 func TestGetNumberOfPlayersStillPlaying(t *testing.T) {
 
+	mysql_poker.RefreshPlayerTable(DB)
+
 	tableID := "1"
 	username := "derek"
 	seatNumber := "1"
@@ -66,6 +73,8 @@ func TestGetNumberOfPlayersStillPlaying(t *testing.T) {
 }
 
 func TestGetNextAvailableSeat(t *testing.T) {
+
+	mysql_poker.RefreshPlayerTable(DB)
 	
 	tableID := "1"
 
@@ -85,6 +94,9 @@ func TestGetNextAvailableSeat(t *testing.T) {
 }
 
 func TestGetPlayersFunds(t *testing.T) {
+
+	mysql_poker.RefreshPlayerTable(DB)
+
 	username := "derek"
 	
 	playersMoneyInPot := GetPlayersMoneyInPot(DB, testingPlayersTableName, username)
@@ -96,6 +108,9 @@ func TestGetPlayersFunds(t *testing.T) {
 }
 
 func TestGetPlayersMoneyInPot(t *testing.T) {
+
+	mysql_poker.RefreshPlayerTable(DB)
+
 	username := "derek"
 	
 	funds := GetPlayersFunds(DB, testingPlayersTableName, username)
@@ -107,6 +122,10 @@ func TestGetPlayersMoneyInPot(t *testing.T) {
 }
 
 func TestGetDealerAndHighestBidder(t *testing.T) {
+	
+	mysql_poker.RefreshPokerTable(DB)
+	mysql_poker.RefreshPlayerTable(DB)
+
 	tableID := "1"
 	
 	highestBidder, highestBidderSeatNumber, dealer, dealerSeatNumber := GetDealerAndHighestBidder(DB, testingPlayersTableName, testingPokerTableName, tableID)
@@ -126,6 +145,7 @@ func TestGetDealerAndHighestBidder(t *testing.T) {
 }
 
 func TestGetCurrentPlayerMakingMove(t *testing.T) {
+
 	tableID := "1"
 
 	currentPlayerMakingMove, seatNumber := GetCurrentPlayerMakingMove(DB, testingTablesTableName, testingPlayersTableName, tableID)
