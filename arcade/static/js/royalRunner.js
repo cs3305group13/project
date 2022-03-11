@@ -1,5 +1,6 @@
+window.addEventListener('DOMContentLoaded', main, false);
 
-(() => {
+function main () {
     const main = document.querySelector('#main');
     if (!main.getContext) {
         return;
@@ -300,5 +301,4 @@
                 break;
         }
     });
-
-})();
+}
